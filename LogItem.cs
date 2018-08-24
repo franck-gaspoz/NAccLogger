@@ -4,32 +4,85 @@ using System.Threading;
 
 namespace NAccLogger
 {
+    /// <summary>
+    /// item of log
+    /// </summary>
     public class LogItem
     {
+        /// <summary>
+        /// log entry counter
+        /// </summary>
         static long _Index = 0;
 
+        /// <summary>
+        /// log entry index
+        /// </summary>
         public long Index { get; protected set; }
 
+        /// <summary>
+        /// date and time when the call was done
+        /// </summary>
         public DateTime DateTime { get; protected set; }
 
+        /// <summary>
+        /// thread id of the caller
+        /// </summary>
         public long ThreadId { get; protected set; }
 
+        /// <summary>
+        /// process id of the caller
+        /// </summary>
         public long ProcessId { get; protected set; }
 
+        /// <summary>
+        /// process name of the caller
+        /// </summary>
         public string ProcessName { get; protected set; }
 
+        /// <summary>
+        /// message of the log entry
+        /// </summary>
         public string Text { get; protected set; }
 
+        /// <summary>
+        /// type of the log entry
+        /// </summary>
         public LogType LogType { get; protected set; }
 
+        /// <summary>
+        /// category of the log entry
+        /// </summary>
         public LogCategory LogCategory { get; protected set; }
 
+        /// <summary>
+        /// method or property name of the caller
+        /// </summary>
         public string CallerMemberName { get; protected set; }
 
+        /// <summary>
+        /// line number of the caller
+        /// </summary>
         public int CallerLineNumber { get; protected set; }
 
+        /// <summary>
+        /// filename of the caller
+        /// </summary>
         public string CallerFilePath { get; protected set; }
 
+        /// <summary>
+        /// text of the log entry after formatted by any logger
+        /// </summary>
+        public string LogEntryText { get; set; }
+
+        /// <summary>
+        /// new log item having mandatory,not automatic properties
+        /// </summary>
+        /// <param name="text">text of the log item</param>
+        /// <param name="logType">type of the log entry</param>
+        /// <param name="logCategory">category of the log entry</param>
+        /// <param name="callerMemberName">name of the property or method wich made the call</param>
+        /// <param name="callerLineNumber">line number in the source file where the call was done</param>
+        /// <param name="callerFilePath">file name where the call was done</param>
         public LogItem(
             string text, 
             LogType logType = LogType.NotDefined,
@@ -54,6 +107,10 @@ namespace NAccLogger
             CallerFilePath = callerFilePath;
         }
 
+        /// <summary>
+        /// returns a simple string view of the log item for debug purposes
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return $"[{LogType}] {Text}";
