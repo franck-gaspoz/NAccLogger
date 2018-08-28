@@ -1,8 +1,12 @@
 ﻿namespace NAccLogger
 {
+    /// <summary>
+    /// inventory of common log categories
+    /// </summary>
     public enum LogCategory
     {
         NotDefined,
+        Application,
         IO,
         IoC,
         EntityDatabaseClient,
@@ -17,6 +21,12 @@
         Process,
         Performance,
         DbQuery,
-        System
+        System,
+
+        /// <summary>
+        /// to define filters only
+        /// </summary>
+        All,
+        Memory
     }
 }

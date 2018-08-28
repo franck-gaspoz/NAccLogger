@@ -1,6 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Linq;
+using System.Collections.Generic;
+using NAccLogger.Itf;
 
 namespace NAccLogger
 {
@@ -10,6 +13,14 @@ namespace NAccLogger
     /// </summary>
     public static class Log
     {
+        #region attributes
+
+        /// <summary>
+        /// common loggers parameters
+        /// </summary>
+        public static LogParameters LoggerParameters
+            = new LogParameters();
+
         /// <summary>
         /// log implementation abstraction
         /// </summary>
@@ -32,20 +43,9 @@ namespace NAccLogger
         }
 
         /// <summary>
-        /// log items list
-        /// </summary>
-        public static BindingList<LogItem> LogItems
-        {
-            get
-            {
-                return LogImpl.LogItems;
-            }
-        }
-
-        /// <summary>
         /// get or replace the default add to log action
         /// </summary>
-        public static Action<BindingList<LogItem>, LogItem> AddAction
+        public static Action<BindingList<ILogItem>, ILogItem> AddAction
         {
             get
             {
@@ -56,9 +56,24 @@ namespace NAccLogger
                 LogImpl.AddAction = value;
             }
         }
+        
+        #endregion
+
+        #region facade specific operations
 
         /// <summary>
-        /// set the logger implementation
+        /// returns a wrapper to log items list
+        /// </summary>
+        public static List<ILogItem> LogItems
+        {
+            get
+            {
+                return LogImpl.LogItems.ToList();
+            }
+        }
+        
+        /// <summary>
+        /// set the root logger implementation
         /// </summary>
         /// <param name="log"></param>
         public static void SetLogger(ILog log)
@@ -67,7 +82,7 @@ namespace NAccLogger
         }
 
         /// <summary>
-        /// get the logger implementation
+        /// get the root logger implementation
         /// </summary>
         /// <returns>log interface of the current logger implementation</returns>
         public static ILog GetLogger()
@@ -75,8 +90,43 @@ namespace NAccLogger
             return LogImpl;
         }
 
+        #endregion
+
+        #region ILog interface wrappers
+
+        #region log add entry operation with filtering
+
         /// <summary>
-        /// try to add an entry to the log having log level 'Info' and the specified log category or LogCategory.NotDefined
+        /// check for adding an entry to the log having log level 'Info' and the specified log category or LogCategory.NotDefined
+        /// </summary>
+        /// <param name="caller">caller object</param>
+        /// <param name="logType">type of the log entry</param>
+        /// <param name="logCategory">category of the log entry from LogCategory</param>
+        /// <param name="callerMemberName">retreive the name of the method or property wich called the log</param>
+        /// <param name="callerLineNumber">retreive the name of the line number (if available) where the log call was done</param>
+        /// <param name="callerFilePath">retreive the filename (if available) of the source code where the log call was done</param>
+        /// <returns>null if log entry doesn't match log filters, else return an invoker to call the T method</returns>
+        public static ILogInvoker Add(
+            object caller,
+            LogType logType = LogType.NotDefined,
+            LogCategory logCategory = LogCategory.NotDefined,
+            [CallerMemberName] string callerMemberName = "",
+            [CallerLineNumber] int callerLineNumber = 0,
+            [CallerFilePath] string callerFilePath = ""
+            )
+        {
+            return LogImpl.Add(
+                caller,
+                logType,
+                logCategory,
+                callerMemberName,
+                callerLineNumber,
+                callerFilePath
+                );
+        }
+
+        /// <summary>
+        /// check for adding an entry to the log having log level 'Info' and the specified log category or LogCategory.NotDefined
         /// </summary>
         /// <param name="logCategory">category of the log entry from LogCategory</param>
         /// <param name="callerMemberName">retreive the name of the method or property wich called the log</param>
@@ -99,7 +149,7 @@ namespace NAccLogger
         }
 
         /// <summary>
-        /// try to add an entry to the log having log level 'Debug' and the specified log category or LogCategory.NotDefined
+        /// check for adding an entry to the log having log level 'Debug' and the specified log category or LogCategory.NotDefined
         /// </summary>
         /// <param name="logCategory">category of the log entry from LogCategory</param>
         /// <param name="callerMemberName">retreive the name of the method or property wich called the log</param>
@@ -122,7 +172,7 @@ namespace NAccLogger
         }
 
         /// <summary>
-        /// try to add an entry to the log having log level 'Warning' and the specified log category or LogCategory.NotDefined
+        /// check for adding an entry to the log having log level 'Warning' and the specified log category or LogCategory.NotDefined
         /// </summary>
         /// <param name="logCategory">category of the log entry from LogCategory</param>
         /// <param name="callerMemberName">retreive the name of the method or property wich called the log</param>
@@ -145,7 +195,7 @@ namespace NAccLogger
         }
 
         /// <summary>
-        /// try to add an entry to the log having log level 'Error' and the specified log category or LogCategory.NotDefined
+        /// check for adding an entry to the log having log level 'Error' and the specified log category or LogCategory.NotDefined
         /// </summary>
         /// <param name="logCategory">category of the log entry from LogCategory</param>
         /// <param name="callerMemberName">retreive the name of the method or property wich called the log</param>
@@ -165,6 +215,41 @@ namespace NAccLogger
                 callerLineNumber,
                 callerFilePath
                 );
+        }
+
+        /// <summary>
+        /// check for adding an entry to the log having log level 'Fatal' and the specified log category or LogCategory.NotDefined
+        /// </summary>
+        /// <param name="logCategory">category of the log entry from LogCategory</param>
+        /// <param name="callerMemberName">retreive the name of the method or property wich called the log</param>
+        /// <param name="callerLineNumber">retreive the name of the line number (if available) where the log call was done</param>
+        /// <param name="callerFilePath">retreive the filename (if available) of the source code where the log call was done</param>
+        /// <returns>null if log entry doesn't match log filters, else return an invoker to call the T method</returns>
+        public static ILogInvoker Fatal(
+            LogCategory logCategory = LogCategory.NotDefined,
+            [CallerMemberName] string callerMemberName = "",
+            [CallerLineNumber] int callerLineNumber = 0,
+            [CallerFilePath] string callerFilePath = ""
+            )
+        {
+            return LogImpl.Fatal(
+                logCategory,
+                callerMemberName,
+                callerLineNumber,
+                callerFilePath
+                );
+        }
+
+        #endregion
+
+        #region log add entry operations without filtering
+
+        /// <summary>
+        /// add header entry to the log
+        /// </summary>
+        public static void Header()
+        {
+            LogImpl.Header();
         }
 
         /// <summary>
@@ -271,6 +356,7 @@ namespace NAccLogger
         /// add a new log entry to the log having the specified properties
         /// </summary>
         /// <param name="text">message of the log entry</param>
+        /// <param name="caller">caller object</param>
         /// <param name="logType">type of the log entry from LogType</param>
         /// <param name="logCategory">category of the log entry from LogCategory</param>
         /// <param name="callerMemberName">retreive the name of the method or property wich called the log</param>
@@ -278,6 +364,7 @@ namespace NAccLogger
         /// <param name="callerFilePath">retreive the filename (if available) of the source code where the log call was done</param>
         public static void Add(
             string text,
+            object caller = null,
             LogType logType = LogType.NotDefined,
             LogCategory logCategory = LogCategory.NotDefined,
             [CallerMemberName] string callerMemberName = "",
@@ -287,6 +374,7 @@ namespace NAccLogger
         {
             LogImpl.Add(
                 text,
+                caller,
                 logType,
                 logCategory,
                 callerMemberName,
@@ -294,5 +382,9 @@ namespace NAccLogger
                 callerFilePath
                 );
         }
+
+        #endregion
+
+        #endregion
     }
 }

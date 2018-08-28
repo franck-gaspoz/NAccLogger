@@ -64,27 +64,43 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ILog.cs" />
-    <Compile Include="ILogInvoker.cs" />
+    <Compile Include="Ext\IgnoreColumnAttribute.cs" />
+    <Compile Include="Ext\ObjectExt.cs" />
+    <Compile Include="FilterValues.cs" />
+    <Compile Include="Impl\MultiLogInvoker.cs" />
+    <Compile Include="Itf\ILogItem.cs" />
+    <Compile Include="Itf\ILog.cs" />
+    <Compile Include="Itf\ILogFilter.cs" />
+    <Compile Include="Itf\ILogInvoker.cs" />
+    <Compile Include="Itf\ILogItemTextFormatter.cs" />
     <Compile Include="Log.cs" />
-    <Compile Include="LogBase.cs" />
+    <Compile Include="Impl\LogBase.cs" />
     <Compile Include="LogCategory.cs" />
+    <Compile Include="Loggers\Pipe\Dispatcher.cs" />
+    <Compile Include="LogParameters.cs" />
+    <Compile Include="Loggers\Pipe\Repeater.cs" />
     <Compile Include="Loggers\SystemConsole.cs" />
     <Compile Include="Loggers\SystemDiagnostics.cs" />
-    <Compile Include="LogInvoker.cs" />
-    <Compile Include="LogItem.cs" />
+    <Compile Include="Impl\LogInvoker.cs" />
+    <Compile Include="Impl\LogItem.cs" />
+    <Compile Include="Impl\LogFilter.cs" />
+    <Compile Include="Impl\LogItemTextFormatter.cs" />
     <Compile Include="LogType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitattributes" />
     <Content Include=".gitignore" />
+    <None Include="docs\index.md" />
+    <None Include="Doc\ClassDiagram.png" />
     <Content Include="NAccLogger.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Doc\ClassDiagram.cd" />
     <None Include="NAccLogger.1.0.0.nupkg" />
     <None Include="NAccLogger.nuspec" />
     <None Include="README.md" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
