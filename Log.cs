@@ -4,6 +4,8 @@ using System.Runtime.CompilerServices;
 using System.Linq;
 using System.Collections.Generic;
 using NAccLogger.Itf;
+using NAccLogger.Loggers;
+using NAccLogger.Loggers.Pipe;
 
 namespace NAccLogger
 {
@@ -25,7 +27,14 @@ namespace NAccLogger
         /// log implementation abstraction
         /// </summary>
         static ILog LogImpl { get; set; }
-            = new Loggers.SystemConsole();
+            = new Dispatcher(
+                new List<ILog>{
+                    new SystemConsole(),
+                    new SystemDiagnostics()
+                });
+
+        /*static ILog LogImpl { get; set; }
+            = new SystemConsole();*/
 
         /// <summary>
         /// enable/disable log items records in LogItems

@@ -46,6 +46,16 @@ namespace NAccLogger.Impl
         }
 
         /// <summary>
+        /// restore default columns size
+        /// </summary>
+        public void ResetColumnsSize()
+        {
+            MinColumnSize.Clear();
+            foreach (var c in Columns)
+                MinColumnSize.Add(c, c.Length);
+        }
+
+        /// <summary>
         /// restore default columns
         /// </summary>
         public void ResetColumns()

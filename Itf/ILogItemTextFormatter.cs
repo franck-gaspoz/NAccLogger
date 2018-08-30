@@ -35,5 +35,10 @@ namespace NAccLogger.Itf
         /// restore default columns
         /// </summary>
         void ResetColumns();
+
+        /// <summary>
+        /// restore default columns size
+        /// </summary>
+        void ResetColumnsSize();
     }
 }

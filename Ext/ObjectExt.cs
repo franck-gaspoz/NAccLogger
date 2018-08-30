@@ -22,7 +22,7 @@ namespace NAccLogger.Ext
             )
         {
             throw new NotImplementedException();
-            return null;
+            //return null;
         }
 
         /// <summary>
