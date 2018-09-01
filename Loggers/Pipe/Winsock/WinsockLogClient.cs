@@ -314,6 +314,7 @@ namespace NAccLogger.Loggers.Pipe.Winsock
             }
             catch (Exception)
             {
+                // rethrow
                 throw;
             }
         }
