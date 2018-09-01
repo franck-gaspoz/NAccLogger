@@ -27,29 +27,21 @@ namespace NAccLogger.Impl
             new BindingList<ILogItem>();
 
         /// <summary>
-        /// log filters
+        /// log parameters
         /// </summary>
-        public ILogFilter LogFilter { get; protected set; }
-
-        /// <summary>
-        /// log item text formatter
-        /// </summary>
-        public ILogItemTextFormatter LogItemTextFormatter { get; protected set; }
+        public LogParameters LogParameters { get; protected set; }
 
         #endregion
 
         /// <summary>
         /// build a new logger base
         /// </summary>
-        /// <param name="loggerParameters">common logger parameters. ignored if null</param>
+        /// <param name="logParameters">common logger parameters. ignored if null</param>
         public LogBase(
-            LogParameters loggerParameters
+            LogParameters logParameters
             )
         {
-            LogFilter = (loggerParameters != null && loggerParameters.LogFilter != null) ?
-                loggerParameters.LogFilter : NAccLogger.Log.LoggerParameters.LogFilter;
-            LogItemTextFormatter = (loggerParameters != null && loggerParameters.LogItemTextFormatter!=null) ?
-                loggerParameters.LogItemTextFormatter : NAccLogger.Log.LoggerParameters.LogItemTextFormatter;
+            LogParameters = logParameters ?? NAccLogger.Log.LoggerParameters;
         }
 
         #region log add entry operations with filtering
@@ -61,7 +53,7 @@ namespace NAccLogger.Impl
             [CallerFilePath] string callerFilePath = ""
             )
         {
-            return LogFilter.CheckFilter(
+            return LogParameters.LogFilter.CheckFilter(
                 this,
                 null,
                 null,
@@ -80,7 +72,7 @@ namespace NAccLogger.Impl
             [CallerFilePath] string callerFilePath = ""
             )
         {
-            return LogFilter.CheckFilter(
+            return LogParameters.LogFilter.CheckFilter(
                 this,
                 null,
                 null,
@@ -99,7 +91,7 @@ namespace NAccLogger.Impl
             [CallerFilePath] string callerFilePath = ""
             )
         {
-            return LogFilter.CheckFilter(
+            return LogParameters.LogFilter.CheckFilter(
                 this,
                 null,
                 null,
@@ -118,7 +110,7 @@ namespace NAccLogger.Impl
             [CallerFilePath] string callerFilePath = ""
             )
         {
-            return LogFilter.CheckFilter(
+            return LogParameters.LogFilter.CheckFilter(
                 this,
                 null,
                 null,
@@ -148,10 +140,10 @@ namespace NAccLogger.Impl
             [CallerLineNumber] int callerLineNumber = 0,
             [CallerFilePath] string callerFilePath = "")
         {
-            return LogFilter.CheckFilter(
+            return LogParameters.LogFilter.CheckFilter(
                 this,
                 caller,
-                (caller == null) ? null : caller.GetType().FullName,
+                caller?.GetType().FullName,
                 callerMemberName,
                 logType,
                 logCategory,
@@ -167,7 +159,7 @@ namespace NAccLogger.Impl
             [CallerFilePath] string callerFilePath = ""
             )
         {
-            return LogFilter.CheckFilter(
+            return LogParameters.LogFilter.CheckFilter(
                 this,
                 null,
                 null,
@@ -188,19 +180,15 @@ namespace NAccLogger.Impl
         /// </summary>
         public virtual void Header()
         {
-            var it = new LogItem(
-                    LogItemTextFormatter.GetHeader()
-                )
-            {
-                IsTextOnly = true
-            };
-            it.LogEntryText = LogItemTextFormatter.LogItemToString(it);
+            var it = LogParameters.LogFactory.CreateLogItem(
+                LogParameters.LogItemTextFormatter.GetHeader()
+                );
+            it.IsTextOnly = true;
+            it.LogEntryText = LogParameters.LogItemTextFormatter.LogItemToString(it);
 
             // TODO: add this in logitemtextformatter (?)
-            var ithsep = new LogItem("".PadLeft(it.LogEntryText.Length, '-'))
-            {
-                IsTextOnly = true
-            };
+            var ithsep = LogParameters.LogFactory.CreateLogItem("".PadLeft(it.LogEntryText.Length, '-'));
+            ithsep.IsTextOnly = true;
 
             AddInternal(ithsep);
             AddInternal(it);
@@ -261,10 +249,10 @@ namespace NAccLogger.Impl
         {
             Add(text, null, LogType.Debug, logCategory, callerMemberName, callerLineNumber, callerFilePath);
         }
-
+        
         public virtual ILogItem Add(
             string text,
-            object caller,
+            object caller = null,
             LogType logType = LogType.NotDefined,
             LogCategory logCategory = LogCategory.NotDefined,
             [CallerMemberName] string callerMemberName = "",
@@ -272,21 +260,18 @@ namespace NAccLogger.Impl
             [CallerFilePath] string callerFilePath = ""
             )
         {
-            // TODO: 
-            // 1. build log item text depending on schema
-            // 2. do it in a derived class
-
-            var callerTypeName = (caller == null) ? null : caller.GetType().FullName;
-
+            var callerTypeName = caller?.GetType().FullName;
             var it =
-                    new LogItem(
-                        text,
-                        callerTypeName,
-                        logType,
-                        logCategory,
-                        callerMemberName,
-                        callerLineNumber,
-                        callerFilePath
+                    LogParameters
+                        .LogFactory
+                            .CreateLogItem(
+                                text,
+                                callerTypeName,
+                                logType,
+                                logCategory,
+                                callerMemberName,
+                                callerLineNumber,
+                                callerFilePath
                         );
 
             AddInternal(it);
@@ -300,7 +285,16 @@ namespace NAccLogger.Impl
         /// <param name="logItem"></param>
         public abstract void Log(ILogItem logItem);
 
-        #endregion        
+        #endregion
+
+        /// <summary>
+        /// add a log item to the log
+        /// </summary>
+        /// <param name="logItem">log item</param>
+        public void Add(ILogItem logItem)
+        {
+            AddInternal(logItem);
+        }
 
         /// <summary>
         /// internal add a log item to log
@@ -309,7 +303,7 @@ namespace NAccLogger.Impl
         protected virtual void AddInternal(ILogItem it)
         {
             // build log item text
-            it.LogEntryText = LogItemTextFormatter.LogItemToString(it);
+            it.LogEntryText = LogParameters.LogItemTextFormatter.LogItemToString(it);
 
             if (IsRecordingEnabled)
             {

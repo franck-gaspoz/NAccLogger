@@ -25,14 +25,14 @@ namespace NAccLogger.Itf
         Action<BindingList<ILogItem>, ILogItem> AddAction { get; set; }
 
         /// <summary>
-        /// log filters
+        /// log parameters
         /// </summary>
-        ILogFilter LogFilter { get; }
+        LogParameters LogParameters { get; }
 
         /// <summary>
-        /// log item text formatter
+        /// add header entry to the log
         /// </summary>
-        ILogItemTextFormatter LogItemTextFormatter { get; }
+        void Header();
 
         /// <summary>
         /// default log item add action for recording log items into LogItems
@@ -47,10 +47,10 @@ namespace NAccLogger.Itf
         ILogItem Add(
             string text,
             object caller = null,
-            LogType logType = LogType.NotDefined, 
-            LogCategory logCategory = LogCategory.NotDefined, 
-            [CallerMemberName] string callerMemberName = "", 
-            [CallerLineNumber] int callerLineNumber = 0, 
+            LogType logType = LogType.NotDefined,
+            LogCategory logCategory = LogCategory.NotDefined,
+            [CallerMemberName] string callerMemberName = "",
+            [CallerLineNumber] int callerLineNumber = 0,
             [CallerFilePath] string callerFilePath = ""
             );
 
@@ -63,9 +63,10 @@ namespace NAccLogger.Itf
         #region log add entry operations without filtering
 
         /// <summary>
-        /// add header entry to the log
+        /// add a log item to the log
         /// </summary>
-        void Header();
+        /// <param name="logItem">log item</param>
+        void Add(ILogItem logItem);
 
         /// <summary>
         /// add an entry to the log having log level 'Debug' and the specified log category or LogCategory.NotDefined

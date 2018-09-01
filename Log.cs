@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using NAccLogger.Itf;
 using NAccLogger.Loggers;
 using NAccLogger.Loggers.Pipe;
+using NAccLogger.Impl;
 
 namespace NAccLogger
 {
@@ -16,6 +17,12 @@ namespace NAccLogger
     public static class Log
     {
         #region attributes
+
+        /// <summary>
+        /// log components factory
+        /// </summary>
+        public static ILogFactory LogFactory { get; set; }
+            = new LogFactory();
 
         /// <summary>
         /// common loggers parameters
@@ -29,12 +36,9 @@ namespace NAccLogger
         static ILog LogImpl { get; set; }
             = new Dispatcher(
                 new List<ILog>{
-                    new SystemConsole(),
+                    new Loggers.Console.SystemConsole(),
                     new SystemDiagnostics()
                 });
-
-        /*static ILog LogImpl { get; set; }
-            = new SystemConsole();*/
 
         /// <summary>
         /// enable/disable log items records in LogItems
@@ -359,7 +363,7 @@ namespace NAccLogger
                 callerLineNumber,
                 callerFilePath
                 );
-        }
+        } 
 
         /// <summary>
         /// add a new log entry to the log having the specified properties
@@ -390,6 +394,15 @@ namespace NAccLogger
                 callerLineNumber,
                 callerFilePath
                 );
+        }
+
+        /// <summary>
+        /// add a log item to the log
+        /// </summary>
+        /// <param name="logItem">log item</param>
+        public static void Add(ILogItem logItem)
+        {
+            LogImpl.Add(logItem);
         }
 
         #endregion
