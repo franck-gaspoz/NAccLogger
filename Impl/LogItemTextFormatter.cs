@@ -175,5 +175,16 @@ namespace NAccLogger.Impl
         {
             throw new Exception($"Unknown log item column: '{column}'");
         }
+
+        /// <summary>
+        /// get columns taken into account when formatting log item to text
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<string> GetColumns()
+        {
+            var r = new List<string>();
+            r.AddRange(Columns);
+            return r;
+        }
     }
 }

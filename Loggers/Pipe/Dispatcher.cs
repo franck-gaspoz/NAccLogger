@@ -74,7 +74,7 @@ namespace NAccLogger.Loggers.Pipe
             )
         {
             // check the Dispatcher logger filter
-            var invoker = LogFilter.CheckFilter(
+            var invoker = LogParameters.LogFilter.CheckFilter(
                 this,
                 null,
                 null,
@@ -110,6 +110,7 @@ namespace NAccLogger.Loggers.Pipe
             {
                 var linvoker =
                     o
+                        .LogParameters
                         .LogFilter
                         .CheckFilter(
                             o,
@@ -162,7 +163,7 @@ namespace NAccLogger.Loggers.Pipe
         #endregion
 
         /// <summary>
-        /// add a new log entry to the repeater logger
+        /// add a new log entry to the dispatcher logger
         /// </summary>
         /// <param name="logItem"></param>
         public override void Log(ILogItem logItem)

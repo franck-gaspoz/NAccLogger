@@ -1,5 +1,4 @@
-﻿using NAccLogger.Impl;
-using NAccLogger.Itf;
+﻿using NAccLogger.Itf;
 
 namespace NAccLogger
 {
@@ -8,6 +7,11 @@ namespace NAccLogger
     /// </summary>
     public class LogParameters
     {
+        /// <summary>
+        /// log components factory
+        /// </summary>
+        public ILogFactory LogFactory;
+
         /// <summary>
         /// log filter. ignored if null
         /// </summary>
@@ -23,8 +27,9 @@ namespace NAccLogger
         /// </summary>
         public LogParameters()
         {
-            LogFilter = new LogFilter();
-            LogItemTextFormatter = new LogItemTextFormatter();
+            LogFactory = Log.LogFactory;
+            LogFilter = LogFactory.CreateLogFilter();
+            LogItemTextFormatter = LogFactory.CreateLogItemTextFormatter();
         }
     }
 }

@@ -32,6 +32,12 @@ namespace NAccLogger.Itf
         void SetColumns(IEnumerable<string> columns);
 
         /// <summary>
+        /// get columns taken into account when formatting log item to text
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<string> GetColumns();
+
+        /// <summary>
         /// restore default columns
         /// </summary>
         void ResetColumns();

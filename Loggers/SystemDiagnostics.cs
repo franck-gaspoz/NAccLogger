@@ -4,7 +4,7 @@ using NAccLogger.Itf;
 namespace NAccLogger.Loggers
 {
     /// <summary>
-    /// system diagnostics
+    /// system diagnostics log
     /// </summary>
     public class SystemDiagnostics
         : LogBase
@@ -12,10 +12,10 @@ namespace NAccLogger.Loggers
         /// <summary>
         /// build a new system diagnostics logger
         /// </summary>
-        /// <param name="loggerParameters"></param>
+        /// <param name="logParameters"></param>
         public SystemDiagnostics(
-            LogParameters loggerParameters = null
-        ) : base(loggerParameters) { }
+            LogParameters logParameters = null
+        ) : base(logParameters) { }
 
         /// <summary>
         /// add a new entty to the system diagnostics

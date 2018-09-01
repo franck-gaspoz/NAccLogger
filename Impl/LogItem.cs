@@ -2,13 +2,18 @@
 using NAccLogger.Itf;
 using System;
 using System.Diagnostics;
+using System.Net;
 using System.Threading;
+using System.Linq;
+using System.Net.Sockets;
+using System.Net.NetworkInformation;
 
 namespace NAccLogger.Impl
 {
     /// <summary>
     /// item of log
     /// </summary>
+    [Serializable]
     public class LogItem : ILogItem
     {
         /// <summary>
@@ -25,7 +30,17 @@ namespace NAccLogger.Impl
         /// date and time when the call was done
         /// </summary>
         public DateTime DateTime { get; protected set; }
-        
+
+        /// <summary>
+        /// Host name
+        /// </summary>
+        public string HostName { get; protected set; }
+
+        /// <summary>
+        /// IPAddress
+        /// </summary>
+        public IPAddress IPAddress { get; protected set; }
+
         /// <summary>
         /// process id of the caller
         /// </summary>
@@ -75,7 +90,7 @@ namespace NAccLogger.Impl
         /// line number of the caller
         /// </summary>
         public int CallerLineNumber { get; protected set; }
-
+        
         /// <summary>
         /// text of the log entry after formatted by any logger
         /// </summary>
@@ -108,6 +123,22 @@ namespace NAccLogger.Impl
             string callerFilePath = ""
             )
         {
+            Init();
+            
+            CallerTypeName = callerTypeName;
+            Text = text;
+            LogType = logType;
+            LogCategory = logCategory;
+            CallerMemberName = callerMemberName;
+            CallerLineNumber = callerLineNumber;
+            CallerFilePath = callerFilePath;            
+        }
+
+        /// <summary>
+        /// init automatic properties
+        /// </summary>
+        public virtual void Init()
+        {
             Index = _Index;
             _Index++;
             DateTime = DateTime.Now;
@@ -115,13 +146,9 @@ namespace NAccLogger.Impl
             ProcessId = p.Id;
             ProcessName = p.ProcessName;
             ThreadId = Thread.CurrentThread.ManagedThreadId;
-            CallerTypeName = callerTypeName;
-            Text = text;
-            LogType = logType;
-            LogCategory = logCategory;
-            CallerMemberName = callerMemberName;
-            CallerLineNumber = callerLineNumber;
-            CallerFilePath = callerFilePath;
+
+            HostName = Network.HostName;
+            IPAddress = Network.IP_V4 ?? Network.IP_V6;
         }
 
         /// <summary>

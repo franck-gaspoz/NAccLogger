@@ -20,7 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -56,6 +56,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -67,7 +68,9 @@
     <Compile Include="Ext\IgnoreColumnAttribute.cs" />
     <Compile Include="Ext\ObjectExt.cs" />
     <Compile Include="FilterValues.cs" />
+    <Compile Include="Impl\LogFactory.cs" />
     <Compile Include="Impl\MultiLogInvoker.cs" />
+    <Compile Include="Itf\ILogFactory.cs" />
     <Compile Include="Itf\ILogItem.cs" />
     <Compile Include="Itf\ILog.cs" />
     <Compile Include="Itf\ILogFilter.cs" />
@@ -76,27 +79,43 @@
     <Compile Include="Log.cs" />
     <Compile Include="Impl\LogBase.cs" />
     <Compile Include="LogCategory.cs" />
+    <Compile Include="Loggers\Console\ColorSettings.cs" />
     <Compile Include="Loggers\Pipe\Dispatcher.cs" />
+    <Compile Include="Loggers\Pipe\Winsock\ClientHandler.cs" />
+    <Compile Include="Loggers\Pipe\Winsock\Com\Command.cs" />
+    <Compile Include="Loggers\Pipe\Winsock\Com\CommandHandler.cs" />
+    <Compile Include="Loggers\Pipe\Winsock\Com\CommandMessage.cs" />
+    <Compile Include="Loggers\Pipe\Winsock\Com\GetHeader.cs" />
+    <Compile Include="Loggers\Pipe\Winsock\Com\GetHeaderText.cs" />
+    <Compile Include="Loggers\Pipe\Winsock\Com\ICommandMessage.cs" />
+    <Compile Include="Loggers\Pipe\Winsock\IServer.cs" />
+    <Compile Include="Loggers\Pipe\Winsock\MessageSerializer.cs" />
+    <Compile Include="Loggers\Pipe\Winsock\WinsockClientContext.cs" />
+    <Compile Include="Loggers\Pipe\Winsock\WinsockServerContext.cs" />
+    <Compile Include="Loggers\Pipe\Winsock\WinsockServer.cs" />
+    <Compile Include="Loggers\Pipe\Winsock\StateObject.cs" />
+    <Compile Include="Loggers\Pipe\Winsock\WinsockLogClient.cs" />
     <Compile Include="LogParameters.cs" />
     <Compile Include="Loggers\Pipe\Repeater.cs" />
-    <Compile Include="Loggers\SystemConsole.cs" />
+    <Compile Include="Loggers\Console\SystemConsole.cs" />
     <Compile Include="Loggers\SystemDiagnostics.cs" />
     <Compile Include="Impl\LogInvoker.cs" />
     <Compile Include="Impl\LogItem.cs" />
     <Compile Include="Impl\LogFilter.cs" />
     <Compile Include="Impl\LogItemTextFormatter.cs" />
     <Compile Include="LogType.cs" />
+    <Compile Include="Network.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitattributes" />
     <Content Include=".gitignore" />
     <None Include="docs\index.md" />
-    <None Include="Doc\ClassDiagram.png" />
+    <Content Include="Doc\NAccLoggerClassDiagram.png" />
     <Content Include="NAccLogger.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Doc\ClassDiagram.cd" />
+    <None Include="Doc\private\ClassDiagram.cd" />
     <None Include="NAccLogger.1.0.0.nupkg" />
     <None Include="NAccLogger.nuspec" />
     <None Include="README.md" />
