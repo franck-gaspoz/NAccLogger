@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace NAccLogger.Itf
 {
@@ -10,21 +8,6 @@ namespace NAccLogger.Itf
     public interface ILog
     {
         #region attributes
-
-        /// <summary>
-        /// enable/disable log items recording in log history (LogItems)
-        /// </summary>
-        bool IsRecordingEnabled { get; set; }
-
-        /// <summary>
-        /// log items history
-        /// </summary>
-        BindingList<ILogItem> LogItems { get; }
-
-        /// <summary>
-        /// get or replace the default add to log action
-        /// </summary>
-        Action<BindingList<ILogItem>, ILogItem> AddAction { get; set; }
 
         /// <summary>
         /// log parameters
@@ -37,19 +20,19 @@ namespace NAccLogger.Itf
         bool IsForwardEnabled { get; set; }
 
         #endregion
+        
+        /// <summary>
+        /// add a log item to the log
+        /// </summary>
+        /// <param name="logItem">log item</param>
+        void Log(ILogItem logItem);
+
+        #region log add entry operations without filtering
 
         /// <summary>
         /// add header entry to the log
         /// </summary>
         void Header();
-        
-        /// <summary>
-        /// add a log item to the log
-        /// </summary>
-        /// <param name="logItem"></param>
-        void Log(ILogItem logItem);
-
-        #region log add entry operations without filtering
 
         /// <summary>
         /// add a log item to the log

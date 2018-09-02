@@ -47,52 +47,11 @@ namespace NAccLogger
                     new Loggers.Console.SystemConsole(),
                     new SystemDiagnostics()
                 });
-
-        /// <summary>
-        /// enable/disable log items records in LogItems
-        /// </summary>
-        public static bool IsRecordingEnabled
-        {
-            get
-            {
-                return LogImpl.IsRecordingEnabled;
-            }
-            set
-            {
-                LogImpl.IsRecordingEnabled = true;
-            }
-        }
-
-        /// <summary>
-        /// get or replace the default add to log action
-        /// </summary>
-        public static Action<BindingList<ILogItem>, ILogItem> AddAction
-        {
-            get
-            {
-                return LogImpl.AddAction;
-            }
-            set
-            {
-                LogImpl.AddAction = value;
-            }
-        }
-        
+     
         #endregion
 
         #region facade specific operations
-
-        /// <summary>
-        /// returns a wrapper to log items list
-        /// </summary>
-        public static List<ILogItem> LogItems
-        {
-            get
-            {
-                return LogImpl.LogItems.ToList();
-            }
-        }
-        
+       
         /// <summary>
         /// set the root logger pipeline implementation
         /// </summary>
@@ -102,8 +61,6 @@ namespace NAccLogger
             LogImpl = log;
         }
 
-        #endregion
-
         /// <summary>
         /// get the root logger pipeline implementation
         /// </summary>
@@ -112,6 +69,8 @@ namespace NAccLogger
         {
             return LogImpl;
         }
+
+        #endregion
 
         /// <summary>
         /// return appropriate logs impl.

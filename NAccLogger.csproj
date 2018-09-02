@@ -71,6 +71,7 @@
     <Compile Include="Impl\LogDispatcher.cs" />
     <Compile Include="Impl\LogFactory.cs" />
     <Compile Include="Impl\LogFilterBase.cs" />
+    <Compile Include="Impl\LogItemBuffer.cs" />
     <Compile Include="Impl\MultiLogInvoker.cs" />
     <Compile Include="Itf\ILogDispatcher.cs" />
     <Compile Include="Itf\ILogFactory.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Itf\ILog.cs" />
     <Compile Include="Itf\ILogFilter.cs" />
     <Compile Include="Itf\ILogInvoker.cs" />
+    <Compile Include="Itf\ILogItemBuffer.cs" />
     <Compile Include="Itf\ILogItemTextFormatter.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Impl\LogBase.cs" />
@@ -120,7 +122,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Doc\private\ClassDiagram.cd" />
-    <None Include="NAccLogger.1.0.0.nupkg" />
     <None Include="NAccLogger.nuspec" />
     <None Include="README.md" />
   </ItemGroup>

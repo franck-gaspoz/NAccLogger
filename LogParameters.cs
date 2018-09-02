@@ -23,6 +23,16 @@ namespace NAccLogger
         public ILogItemTextFormatter LogItemTextFormatter;
 
         /// <summary>
+        /// log item buffer
+        /// </summary>
+        public ILogItemBuffer LogItemBuffer;
+
+        /// <summary>
+        /// enable/disable log items recording in log history (LogItems)
+        /// </summary>
+        public bool IsRecordingEnabled { get; set; } = false;
+
+        /// <summary>
         /// build new parameters with default values
         /// </summary>
         public LogParameters()
@@ -30,6 +40,7 @@ namespace NAccLogger
             LogFactory = Log.LogFactory;
             LogFilter = LogFactory.CreateLogFilter();
             LogItemTextFormatter = LogFactory.CreateLogItemTextFormatter();
+            LogItemBuffer = LogFactory.CreateLogItemBuffer();
         }
     }
 }

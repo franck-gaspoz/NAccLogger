@@ -1,6 +1,4 @@
 ﻿using NAccLogger.Itf;
-using System;
-using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace NAccLogger.Impl
@@ -9,22 +7,6 @@ namespace NAccLogger.Impl
         : ILog
     {
         #region attributes
-
-        /// <summary>
-        /// replace the default add to LogItems action if defined
-        /// </summary>
-        public Action<BindingList<ILogItem>, ILogItem> AddAction { get; set; } = null;
-
-        /// <summary>
-        /// enable/disable log items recording in log history (LogItems)
-        /// </summary>
-        public bool IsRecordingEnabled { get; set; } = true;
-
-        /// <summary>
-        /// log items history
-        /// </summary>
-        public BindingList<ILogItem> LogItems { get; } =
-            new BindingList<ILogItem>();
 
         /// <summary>
         /// log parameters
@@ -41,7 +23,7 @@ namespace NAccLogger.Impl
         /// <summary>
         /// build a new logger base
         /// </summary>
-        /// <param name="logParameters">common logger parameters. ignored if null</param>
+        /// <param name="logParameters">logger parameters. use NAccLogger.Log log parameters if null</param>
         public LogBase(
             LogParameters logParameters
             )
@@ -296,9 +278,9 @@ namespace NAccLogger.Impl
         }
         
         /// <summary>
-        /// add to log implementation
+        /// log an item (impl.)
         /// </summary>
-        /// <param name="logItem"></param>
+        /// <param name="logItem">log item</param>
         public abstract void Log(ILogItem logItem);
 
         #endregion
@@ -321,17 +303,13 @@ namespace NAccLogger.Impl
             // build log item text
             it.LogEntryText = LogParameters.LogItemTextFormatter.LogItemToString(it);
 
-            if (IsRecordingEnabled)
-            {
-                if (AddAction != null)
-                    // custom record log item
-                    AddAction.Invoke(LogItems, it);
-                else
-                    // record log item
-                    LogItems.Add(it);
-            }
+            if (LogParameters.IsRecordingEnabled)
+                // record log item
+                LogParameters
+                    .LogItemBuffer
+                    .Add(it);
 
-            // add to log impl
+            // add to log impl.
             Log(it);
         }
     }

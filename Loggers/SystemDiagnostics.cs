@@ -18,7 +18,7 @@ namespace NAccLogger.Loggers
         ) : base(logParameters) { }
 
         /// <summary>
-        /// add a new entty to the system diagnostics
+        /// add a new entry to the system diagnostics
         /// </summary>
         /// <param name="logItem">log item to be added</param>
         public override void Log(ILogItem logItem)

@@ -70,5 +70,14 @@ namespace NAccLogger.Impl
         {
             return new LogDispatcher();
         }
+
+        /// <summary>
+        /// create a log item buffer
+        /// </summary>
+        /// <returns>log item buffer</returns>
+        public ILogItemBuffer CreateLogItemBuffer()
+        {
+            return new LogItemBuffer();
+        }
     }
 }

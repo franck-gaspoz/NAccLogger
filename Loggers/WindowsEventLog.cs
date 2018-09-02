@@ -1,11 +1,8 @@
 ﻿using NAccLogger.Impl;
 using NAccLogger.Itf;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NAccLogger.Loggers
 {
@@ -20,17 +17,32 @@ namespace NAccLogger.Loggers
         /// </summary>
         public string EventLogName { get; protected set; }
 
+        public bool ResetEventLog { get; protected set; }
+
+        bool SourceChecked = false;
+
         /// <summary>
-        /// build a new windows event log logger
+        /// build a new windows event log logger logging to 'Application'
         /// </summary>
-        /// <param name="EventLogName">name of the windows event log</param>
-        /// <param name="LogParameters">log parameters</param>
+        /// <param name="logParameters">log parameters</param>
         public WindowsEventLog(
-            string eventLogName,
             LogParameters logParameters = null
             ) : base(logParameters)
         {
-            this.EventLogName = eventLogName;
+            EventLogName = "Application";
+        }
+
+        /// <summary>
+        /// build a new windows event log logger
+        /// </summary>
+        /// <param name="eventLogName">name of the windows event log</param>
+        /// <param name="logParameters">log parameters</param>
+        public WindowsEventLog(
+            string eventLogName,
+            LogParameters logParameters = null            
+            ) : base(logParameters)
+        {
+            EventLogName = eventLogName ?? throw new ArgumentNullException(nameof(eventLogName), "can't be null");
         }
 
         /// <summary>
@@ -43,11 +55,22 @@ namespace NAccLogger.Loggers
             string appName
             )
         {
-            if (!EventLog.Exists(logName))
+            if (!SourceChecked)
             {
-                EventLog.CreateEventSource(
-                    appName,
-                    logName);
+                if (EventLog.SourceExists(appName))
+                    EventLog.DeleteEventSource(appName);
+                SourceChecked = true;
+
+                if (!EventLog.SourceExists(appName))
+                {
+                    var x = new EventSourceCreationData(
+                            appName, logName
+                        );
+
+                    EventLog.CreateEventSource(
+                        x
+                        );
+                }
             }
         }
 
@@ -97,12 +120,24 @@ namespace NAccLogger.Loggers
                 }
             }
 
-            EventLog.WriteEntry(
-                logItem.ProcessName,
-                msg,
-                logEntryType,
-                (int)logItem.Index
-                );
+            var evlog = new EventLog
+            {
+                Log = EventLogName,
+                Source = logItem.ProcessName
+            };
+
+            /*using (var evlog = 
+                new EventLog(
+                    EventLogName,
+                    Environment.MachineName, 
+                    logItem.ProcessName))
+            {*/
+            evlog.WriteEntry(
+                    msg,
+                    logEntryType,
+                    (int)logItem.Index
+                    );
+            //}
         }
     }
 }

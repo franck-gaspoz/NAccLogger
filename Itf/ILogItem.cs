@@ -13,7 +13,7 @@ namespace NAccLogger.Itf
         string CallerMemberName { get; }
         object CallerTypeName { get; set; }
         DateTime DateTime { get; }
-        long Index { get; }
+        int Index { get; }
         bool IsTextOnly { get; set; }
         LogCategory LogCategory { get; }
         string LogEntryText { get; set; }

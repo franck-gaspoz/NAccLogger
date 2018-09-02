@@ -19,12 +19,12 @@ namespace NAccLogger.Impl
         /// <summary>
         /// log entry counter
         /// </summary>
-        static long _Index = 0;
+        static int _Index = 0;
 
         /// <summary>
         /// log entry index
         /// </summary>
-        public long Index { get; protected set; }
+        public int Index { get; protected set; }
 
         /// <summary>
         /// date and time when the call was done

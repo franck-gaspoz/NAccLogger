@@ -42,5 +42,11 @@
         /// </summary>
         /// <returns>a log dispatcher</returns>
         ILogDispatcher CreateLogDispatcher();
+
+        /// <summary>
+        /// create a log item buffer
+        /// </summary>
+        /// <returns>log item buffer</returns>
+        ILogItemBuffer CreateLogItemBuffer();
     }
 }
