@@ -28,7 +28,7 @@
         /// <summary>
         /// create a log item text formatter
         /// </summary>
-        /// <returns></returns>
+        /// <returns>a log item text formatter</returns>
         ILogItemTextFormatter CreateLogItemTextFormatter();
 
         /// <summary>
@@ -36,5 +36,11 @@
         /// </summary>
         /// <returns>log filter impl.</returns>
         ILogFilter CreateLogFilter();
+
+        /// <summary>
+        /// create a log dispatcher
+        /// </summary>
+        /// <returns>a log dispatcher</returns>
+        ILogDispatcher CreateLogDispatcher();
     }
 }

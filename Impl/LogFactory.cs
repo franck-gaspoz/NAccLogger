@@ -17,7 +17,7 @@ namespace NAccLogger.Impl
         /// create a log filter
         /// </summary>
         /// <returns>log filter impl.</returns>
-        public ILogFilter CreateLogFilter()
+        public virtual ILogFilter CreateLogFilter()
         {
             return new LogFilter();
         }
@@ -32,7 +32,7 @@ namespace NAccLogger.Impl
         /// <param name="callerMemberName">name of the property or method wich made the call</param>
         /// <param name="callerLineNumber">line number in the source file where the call was done</param>
         /// <returns>log item impl.</returns>
-        public ILogItem CreateLogItem(
+        public virtual ILogItem CreateLogItem(
             string text,
             string callerTypeName = null,
             LogType logType = LogType.NotDefined,
@@ -57,9 +57,18 @@ namespace NAccLogger.Impl
         /// create a log item text formatter
         /// </summary>
         /// <returns>log item text formatter impl.</returns>
-        public ILogItemTextFormatter CreateLogItemTextFormatter()
+        public virtual ILogItemTextFormatter CreateLogItemTextFormatter()
         {
             return new LogItemTextFormatter();
+        }
+
+        /// <summary>
+        /// create a log dispatcher
+        /// </summary>
+        /// <returns>a log dispatcher</returns>
+        public virtual ILogDispatcher CreateLogDispatcher()
+        {
+            return new LogDispatcher();
         }
     }
 }

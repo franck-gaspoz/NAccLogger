@@ -68,8 +68,11 @@
     <Compile Include="Ext\IgnoreColumnAttribute.cs" />
     <Compile Include="Ext\ObjectExt.cs" />
     <Compile Include="FilterValues.cs" />
+    <Compile Include="Impl\LogDispatcher.cs" />
     <Compile Include="Impl\LogFactory.cs" />
+    <Compile Include="Impl\LogFilterBase.cs" />
     <Compile Include="Impl\MultiLogInvoker.cs" />
+    <Compile Include="Itf\ILogDispatcher.cs" />
     <Compile Include="Itf\ILogFactory.cs" />
     <Compile Include="Itf\ILogItem.cs" />
     <Compile Include="Itf\ILog.cs" />
@@ -95,6 +98,7 @@
     <Compile Include="Loggers\Pipe\Winsock\WinsockServer.cs" />
     <Compile Include="Loggers\Pipe\Winsock\StateObject.cs" />
     <Compile Include="Loggers\Pipe\Winsock\WinsockLogClient.cs" />
+    <Compile Include="Loggers\WindowsEventLog.cs" />
     <Compile Include="LogParameters.cs" />
     <Compile Include="Loggers\Pipe\Repeater.cs" />
     <Compile Include="Loggers\Console\SystemConsole.cs" />

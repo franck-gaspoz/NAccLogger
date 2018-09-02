@@ -22,8 +22,12 @@ namespace NAccLogger.Impl
 
         void Add(string text, object caller, LogType logType = LogType.NotDefined, LogCategory logCategory = LogCategory.NotDefined, [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "")
         {
-            foreach ( var o in Loggers )
+            foreach (var o in Loggers)
+            {
                 o.Add(text, caller, logType, logCategory, callerMemberName, callerLineNumber, callerFilePath);
+                if (!o.IsForwardEnabled)
+                    break;
+            }
         }
     }
 }

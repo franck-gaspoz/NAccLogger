@@ -1,22 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace NAccLogger
 {
-    public class FilterValues
+    /// <summary>
+    /// log item properties filters. Associate a T value to a combination of property values and wildcards
+    /// </summary>
+    /// <typeparam name="T">type of filter values</typeparam>
+    public class FilterValues<T>
     {
         /// <summary>
         /// this string can be substitued to any part of the log item filter key for accepting any value
         /// </summary>
-        public const string AnyStringValueWildcard = "*";
+        public readonly string AnyStringValueWildcard = "*";
 
         /// <summary>
         /// this object can be substitued to any object value for accepting any value
         /// </summary>
-        public static readonly object AnyObjectValueWildcard = new object();
+        public readonly object AnyObjectValueWildcard = new object();
 
         /// <summary>
         /// enabled/disabled log items for key combination
@@ -33,29 +33,33 @@ namespace NAccLogger
                 Dictionary<string,
                     Dictionary<string,
                         Dictionary<string,
-                            Dictionary<string, bool>>>>>
-                EnabledFilters =
-                    new Dictionary<object, Dictionary<string, Dictionary<string, Dictionary<string, Dictionary<string, bool>>>>>();
+                            Dictionary<string, T>>>>>
+                Filters =
+                    new Dictionary<object, 
+                        Dictionary<string, 
+                            Dictionary<string, 
+                                Dictionary<string, 
+                                    Dictionary<string, T>>>>>();
 
         /// <summary>
         /// clear filter values
         /// </summary>
         public void Clear()
         {
-            EnabledFilters.Clear();
+            Filters.Clear();
         }
 
         /// <summary>
         /// set values of a filter : (caller,callerTypeName,callerMemberName,logType,logCategroy) -+ isEnabled
         /// </summary>
-        /// <param name="isEnabled">enabled (true), disabled (false)</param>
+        /// <param name="value">filter value of type T</param>
         /// <param name="caller">caller object</param>
         /// <param name="callerTypeName">caller type name</param>
         /// <param name="callerMemberName">caller member name</param>
         /// <param name="logType">log entry type</param>
         /// <param name="logCategory">log entry category</param>
         public void AddOrSetValue(
-            bool isEnabled,
+            T value,
             object caller = null,
             string callerTypeName = null,
             string callerMemberName = null,
@@ -66,33 +70,33 @@ namespace NAccLogger
             var kcaller = caller ?? AnyObjectValueWildcard;
             var kcallerTypeName = callerTypeName ?? AnyStringValueWildcard;
             var kcallerMemberName = callerMemberName ?? AnyStringValueWildcard;
-            var klogType = (logType!=null)? logType.ToString() : AnyStringValueWildcard;
-            var klogCategory = (logCategory != null)? logCategory.ToString() : AnyStringValueWildcard;
+            var klogType = (logType.HasValue)? logType.Value.ToString() : AnyStringValueWildcard;
+            var klogCategory = (logCategory.HasValue)? logCategory.Value.ToString() : AnyStringValueWildcard;
 
-            if (!EnabledFilters.TryGetValue(kcaller, out var d1))
-                EnabledFilters.Add(kcaller, d1 = new Dictionary<string, Dictionary<string, Dictionary<string, Dictionary<string, bool>>>>() );
+            if (!Filters.TryGetValue(kcaller, out var d1))
+                Filters.Add(kcaller, d1 = new Dictionary<string, Dictionary<string, Dictionary<string, Dictionary<string, T>>>>() );
             if (!d1.TryGetValue(klogType, out var d2))
-                d1.Add(klogType, d2 = new Dictionary<string, Dictionary<string, Dictionary<string, bool>>>() );
+                d1.Add(klogType, d2 = new Dictionary<string, Dictionary<string, Dictionary<string, T>>>() );
             if (!d2.TryGetValue(klogCategory, out var d3))
-                d2.Add(klogCategory, d3 = new Dictionary<string, Dictionary<string, bool>>() );
+                d2.Add(klogCategory, d3 = new Dictionary<string, Dictionary<string, T>>() );
             if (!d3.TryGetValue(kcallerTypeName, out var d4))
-                d3.Add(kcallerTypeName, d4 = new Dictionary<string, bool>());
+                d3.Add(kcallerTypeName, d4 = new Dictionary<string, T>());
             if (!d4.ContainsKey(kcallerMemberName))
-                d4.Add(kcallerMemberName, isEnabled);
+                d4.Add(kcallerMemberName, value);
             else
-                d4[kcallerMemberName] = isEnabled;
+                d4[kcallerMemberName] = value;
         }
 
         /// <summary>
-        /// return isEnabled value of a filter : (caller,callerTypeName,callerMemberName,logType,logCategroy) -+ isEnabled
+        /// return a value matching filter properties : (caller,callerTypeName,callerMemberName,logType,logCategroy) -+ value
         /// </summary>
         /// <param name="caller">caller object</param>
         /// <param name="callerTypeName">caller type name</param>
         /// <param name="callerMemberName">caller member name</param>
         /// <param name="logType">log entry type</param>
         /// <param name="logCategory">log entry category</param>
-        /// <returns>filter isEnabled value if defined, else false</returns>
-        public bool GetValue(
+        /// <returns>filter value if defined, else default(T)</returns>
+        public T GetValue(
             object caller = null,
             string callerTypeName = null,
             string callerMemberName = null,
@@ -106,23 +110,23 @@ namespace NAccLogger
             var klogType = logType.ToString();
             var klogCategory = logCategory.ToString();
 
-            if (!EnabledFilters.TryGetValue(kcaller, out var d1)
-                && !EnabledFilters.TryGetValue(AnyObjectValueWildcard, out d1))
-                return false;
+            if (!Filters.TryGetValue(kcaller, out var d1)
+                && !Filters.TryGetValue(AnyObjectValueWildcard, out d1))
+                return default(T);
             if (!d1.TryGetValue(klogType, out var d2)
                 && !d1.TryGetValue(AnyStringValueWildcard, out d2))
-                return false;
+                return default(T);
             if (!d2.TryGetValue(klogCategory, out var d3)
                 && !d2.TryGetValue(AnyStringValueWildcard,out d3))
-                return false;
+                return default(T);
             if (!d3.TryGetValue(kcallerTypeName, out var d4)
                 && !d3.TryGetValue(AnyStringValueWildcard,out d4))
-                return false;
+                return default(T);
             if (d4.TryGetValue(kcallerMemberName, out var r)
                 || d4.TryGetValue(AnyStringValueWildcard, out r)
                 )
                 return r;
-            return false;
+            return default(T);
         }
     }
 }

@@ -3,6 +3,7 @@ using NAccLogger.Itf;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace NAccLogger.Loggers.Pipe
 {
@@ -22,12 +23,17 @@ namespace NAccLogger.Loggers.Pipe
         /// <summary>
         /// MultiLogInvoker cache
         /// </summary>
-        protected Dictionary<ILogInvoker, MultiLogInvoker>
+        protected Dictionary<int, MultiLogInvoker>
             MultiLogInvokers =
-                new Dictionary<ILogInvoker, MultiLogInvoker>();
+                new Dictionary<int, MultiLogInvoker>();
 
         /// <summary>
-        /// build a new repeater logger
+        /// indicates if the dispatcher filter is enabled or not (thus only logs filters are enabled)
+        /// </summary>
+        public bool IsDispatcherFilterEnabled { get; protected set; }
+
+        /// <summary>
+        /// build a new dispatcher logger
         /// </summary>
         /// <param name="logParameters"></param>
         public Dispatcher(LogParameters logParameters = null)
@@ -36,24 +42,25 @@ namespace NAccLogger.Loggers.Pipe
         /// <summary>
         /// build a new repeater logger initialized with logger list
         /// </summary>
+        /// <param name="loggers">loggers to dispatch to</param>
+        /// <param name="isDispatcherFilterEnabled">if true, the dispatcher check its own filtering rules, else only loggers filters are checked for filtered log actions</param>
         /// <param name="logParameters"></param>
         public Dispatcher(
             List<ILog> loggers,
+            bool isDispatcherFilterEnabled = true,
             LogParameters logParameters = null)
             : base(logParameters)
         {
             if (loggers == null)
                 throw new ArgumentNullException(nameof(loggers));
+            this.IsDispatcherFilterEnabled = isDispatcherFilterEnabled;
             foreach (var o in loggers)
                 Loggers.AddLast(o);
         }
 
-        #region filtered log methods
-
         /// <summary>
         /// check if a filter is enabled
         /// </summary>
-        /// <param name="logger">target logger</param>
         /// <param name="caller">caller object</param>
         /// <param name="callerTypeName">caller type name</param>
         /// <param name="callerMemberName">caller member name</param>
@@ -63,7 +70,6 @@ namespace NAccLogger.Loggers.Pipe
         /// <param name="callerFilePath">file path where source code called the log</param>
         /// <returns>an invoker object to the log, else null</returns>
         protected ILogInvoker CheckFilter(
-            ILog logger, 
             object caller, 
             string callerTypeName, 
             string callerMemberName, 
@@ -73,37 +79,35 @@ namespace NAccLogger.Loggers.Pipe
             string callerFilePath
             )
         {
-            // check the Dispatcher logger filter
-            var invoker = LogParameters.LogFilter.CheckFilter(
-                this,
-                null,
-                null,
-                callerMemberName,
-                LogType.Error,
-                logCategory,
-                callerLineNumber,
-                callerFilePath
-                );
+            if (IsDispatcherFilterEnabled)
+            {
+                // check the Dispatcher logger filter
+                var invoker = LogParameters.LogFilter.CheckFilter(
+                    this,
+                    caller,
+                    callerTypeName,
+                    callerMemberName,
+                    LogType.Error,
+                    logCategory,
+                    callerLineNumber,
+                    callerFilePath
+                    );
 
-            if (invoker == null)
-                return null;
-
-            if (!MultiLogInvokers
-                .TryGetValue(invoker, out var minvoker)) {
-                minvoker =
-                    new MultiLogInvoker()
-                    {
-                        Log = this,
-                        Caller = caller,
-                        LogType = logType,
-                        LogCategory = logCategory,
-                        CallerFilePath = callerFilePath,
-                        CallerLineNumber = callerLineNumber,
-                        CallerMemberName = callerMemberName
-                    };
-                MultiLogInvokers.Add(invoker, minvoker);
+                if (invoker == null)
+                    return null;
             }
 
+            // invoker !=null => multi invoker enabled
+
+            var id = Thread.CurrentThread.ManagedThreadId;
+            if (!MultiLogInvokers
+                .TryGetValue(id, out var minvoker))           
+                MultiLogInvokers
+                    .Add(
+                        id,
+                        minvoker =
+                            new MultiLogInvoker());         
+    
             // check individual loggers filters
             minvoker.Loggers.Clear();
             foreach (var o in Loggers)
@@ -114,8 +118,8 @@ namespace NAccLogger.Loggers.Pipe
                         .LogFilter
                         .CheckFilter(
                             o,
-                            null,
-                            null,
+                            caller,
+                            callerTypeName,
                             callerMemberName,
                             LogType.Error,
                             logCategory,
@@ -123,41 +127,56 @@ namespace NAccLogger.Loggers.Pipe
                             callerFilePath
                         );
                 if (linvoker != null)
+                {
                     minvoker
                         .Loggers
                         .AddLast(o);
+                    if (!o.IsForwardEnabled)
+                        break;
+                }
             }
 
             if (minvoker.Loggers.Count == 0)
-                // no acitve logger
+                // no active logger
                 return null;
+
+            // setup up the invoker for the current log action
+            minvoker.Log = this;
+            minvoker.Caller = caller;
+            minvoker.LogType = logType;
+            minvoker.LogCategory = logCategory;
+            minvoker.CallerFilePath = callerFilePath;
+            minvoker.CallerLineNumber = callerLineNumber;
+            minvoker.CallerMemberName = callerMemberName;
 
             return minvoker;
         }
 
+        #region filtered log actions
+
         public override ILogInvoker Add(object caller, LogType logType = LogType.NotDefined, LogCategory logCategory = LogCategory.NotDefined, [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "")
         {
-            return base.Add(caller, logType, logCategory, callerMemberName, callerLineNumber, callerFilePath);
+            return CheckFilter(caller, caller?.GetType().FullName, callerMemberName, logType, logCategory, callerLineNumber, callerFilePath);
         }
 
         public override ILogInvoker Debug(LogCategory logCategory = LogCategory.NotDefined, [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "")
         {
-            return base.Debug(logCategory, callerMemberName, callerLineNumber, callerFilePath);
+            return CheckFilter(null, null, callerMemberName, LogType.Debug, logCategory, callerLineNumber, callerFilePath);
         }
 
         public override ILogInvoker Error(LogCategory logCategory = LogCategory.NotDefined, [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "")
         {
-            return base.Error(logCategory, callerMemberName, callerLineNumber, callerFilePath);
+            return CheckFilter(null, null, callerMemberName, LogType.Error, logCategory, callerLineNumber, callerFilePath);
         }
 
         public override ILogInvoker Fatal(LogCategory logCategory = LogCategory.NotDefined, [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "")
         {
-            return base.Fatal(logCategory, callerMemberName, callerLineNumber, callerFilePath);
+            return CheckFilter(null, null, callerMemberName, LogType.Fatal, logCategory, callerLineNumber, callerFilePath);
         }
 
         public override ILogInvoker Info(LogCategory logCategory = LogCategory.NotDefined, [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "")
         {
-            return base.Info(logCategory, callerMemberName, callerLineNumber, callerFilePath);
+            return CheckFilter(null, null, callerMemberName, LogType.Info, logCategory, callerLineNumber, callerFilePath);
         }
 
         #endregion
@@ -169,7 +188,11 @@ namespace NAccLogger.Loggers.Pipe
         public override void Log(ILogItem logItem)
         {
             foreach (var o in Loggers)
+            {
                 o.Log(logItem);
+                if (!o.IsForwardEnabled)
+                    break;
+            }
         }
     }
 }

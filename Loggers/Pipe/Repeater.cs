@@ -47,7 +47,11 @@ namespace NAccLogger.Loggers.Pipe
         public override void Log(ILogItem logItem)
         {
             foreach (var o in Loggers)
+            {
                 o.Log(logItem);
+                if (!o.IsForwardEnabled)
+                    break;
+            }
         }
     }
 }

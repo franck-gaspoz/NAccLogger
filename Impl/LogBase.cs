@@ -31,6 +31,11 @@ namespace NAccLogger.Impl
         /// </summary>
         public LogParameters LogParameters { get; protected set; }
 
+        /// <summary>
+        /// if true, any log action is forwarded to nexts loggers in a dispatcher or a pipeline where this log is contained, otherwize this logger is the last to handle the log action (default is true)
+        /// </summary>
+        public bool IsForwardEnabled { get; set; } = true;
+
         #endregion
 
         /// <summary>
@@ -41,7 +46,7 @@ namespace NAccLogger.Impl
             LogParameters logParameters
             )
         {
-            LogParameters = logParameters ?? NAccLogger.Log.LoggerParameters;
+            LogParameters = logParameters ?? NAccLogger.Log.LogParameters;
         }
 
         #region log add entry operations with filtering
@@ -250,6 +255,17 @@ namespace NAccLogger.Impl
             Add(text, null, LogType.Debug, logCategory, callerMemberName, callerLineNumber, callerFilePath);
         }
         
+        /// <summary>
+        /// build a new log item and add it to this logger
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="caller"></param>
+        /// <param name="logType"></param>
+        /// <param name="logCategory"></param>
+        /// <param name="callerMemberName"></param>
+        /// <param name="callerLineNumber"></param>
+        /// <param name="callerFilePath"></param>
+        /// <returns>the log item</returns>
         public virtual ILogItem Add(
             string text,
             object caller = null,

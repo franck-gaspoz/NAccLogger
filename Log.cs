@@ -23,12 +23,20 @@ namespace NAccLogger
         /// </summary>
         public static ILogFactory LogFactory { get; set; }
             = new LogFactory();
-
+        
         /// <summary>
         /// common loggers parameters
         /// </summary>
-        public static LogParameters LoggerParameters
+        public static LogParameters LogParameters
             = new LogParameters();
+
+        /// <summary>
+        /// log dispatcher
+        /// </summary>
+        public static ILogDispatcher LogDispatcher { get; set; }
+            = LogParameters
+                .LogFactory
+                .CreateLogDispatcher();
 
         /// <summary>
         /// log implementation abstraction
@@ -86,7 +94,7 @@ namespace NAccLogger
         }
         
         /// <summary>
-        /// set the root logger implementation
+        /// set the root logger pipeline implementation
         /// </summary>
         /// <param name="log"></param>
         public static void SetLogger(ILog log)
@@ -94,8 +102,10 @@ namespace NAccLogger
             LogImpl = log;
         }
 
+        #endregion
+
         /// <summary>
-        /// get the root logger implementation
+        /// get the root logger pipeline implementation
         /// </summary>
         /// <returns>log interface of the current logger implementation</returns>
         public static ILog GetLogger()
@@ -103,8 +113,137 @@ namespace NAccLogger
             return LogImpl;
         }
 
-        #endregion
+        /// <summary>
+        /// return appropriate logs impl.
+        /// </summary>
+        /// <param name="caller">caller object</param>
+        /// <param name="callerTypeName">caller type name</param>
+        /// <param name="callerMemberName">caller member name</param>
+        /// <param name="logType">log entry type</param>
+        /// <param name="logCategory">log entry category</param>        
+        /// <param name="callerLineNumber">line number where log has been called</param>
+        /// <param name="callerFilePath">file path where source code called the log</param>
+        /// <returns>log impl. is get either from dispatcher or pipeline depending on dispatching rules and pipeline configuration</returns>
+        static 
+            (Dispatcher dispatcher,
+            ILog pipelineLog)
+            GetImpl(
+                object caller,
+                string callerTypeName,
+                string callerMemberName,
+                LogType logType,
+                LogCategory logCategory,
+                int callerLineNumber,
+                string callerFilePath
+            )
+        {
+            if (LogDispatcher == null)
+                return (null, LogImpl);
 
+            return (LogDispatcher
+                .GetDispatcher(
+                    caller,
+                    callerTypeName,
+                    callerMemberName,
+                    logType,
+                    logCategory
+                ), LogImpl);
+        }
+
+        static void CallImpl(
+            string text,
+            object caller,
+            string callerTypeName,
+            LogType logType,
+            LogCategory logCategory,
+            string callerMemberName,
+            int callerLineNumber,
+            string callerFilePath
+            )
+        {
+            var (dispatcher, pipelineLog) = GetImpl(
+                    caller,
+                    callerTypeName,
+                    callerMemberName,
+                    LogType.Info,
+                    logCategory,
+                    callerLineNumber,
+                    callerFilePath);
+
+            bool pipelineEnabled = true;
+            
+            dispatcher?.Add(
+                text,
+                caller,
+                logType,
+                logCategory,
+                callerMemberName,
+                callerLineNumber,
+                callerFilePath
+                );
+
+            if (pipelineEnabled)
+                LogImpl.Add(
+                    text,
+                    caller,
+                    logType,
+                    logCategory,
+                    callerMemberName,
+                    callerLineNumber,
+                    callerFilePath
+                    );
+        }
+        
+        /// <summary>
+        /// non filtered log action call to impl.
+        /// </summary>
+        static ILogInvoker GetCallableImpl(
+            object caller,
+            string callerTypeName,
+            LogType logType,
+            LogCategory logCategory,
+            string callerMemberName,
+            int callerLineNumber,
+            string callerFilePath
+            )
+        {
+            var (dispatcher, pipelineLog) = GetImpl(
+                    caller,
+                    callerTypeName,
+                    callerMemberName,
+                    logType,
+                    logCategory,
+                    callerLineNumber,
+                    callerFilePath);
+
+            if (dispatcher != null)
+            { 
+                if (!dispatcher.Loggers.Contains(LogImpl))
+                    dispatcher.Loggers.AddLast(LogImpl);
+
+                return 
+                    dispatcher?
+                    .Add(
+                        caller,
+                        logType,
+                        logCategory,
+                        callerMemberName,
+                        callerLineNumber,
+                        callerFilePath
+                    );
+            }
+            else
+                return LogImpl
+                    .Add(
+                        caller,
+                        logType,
+                        logCategory,
+                        callerMemberName,
+                        callerLineNumber,
+                        callerFilePath
+                    );
+        }
+       
         #region ILog interface wrappers
 
         #region log add entry operation with filtering
@@ -128,14 +267,15 @@ namespace NAccLogger
             [CallerFilePath] string callerFilePath = ""
             )
         {
-            return LogImpl.Add(
-                caller,
-                logType,
-                logCategory,
-                callerMemberName,
-                callerLineNumber,
-                callerFilePath
-                );
+            return
+                GetCallableImpl(
+                    caller,
+                    caller?.GetType().FullName,                    
+                    logType,
+                    logCategory,
+                    callerMemberName,
+                    callerLineNumber,
+                    callerFilePath);
         }
 
         /// <summary>
@@ -153,12 +293,15 @@ namespace NAccLogger
             [CallerFilePath] string callerFilePath = ""
             )
         {
-            return LogImpl.Info(
-                logCategory,
-                callerMemberName,
-                callerLineNumber,
-                callerFilePath
-                );
+            return
+                GetCallableImpl(
+                    null,
+                    null,
+                    LogType.Info,
+                    logCategory,
+                    callerMemberName,
+                    callerLineNumber,
+                    callerFilePath);
         }
 
         /// <summary>
@@ -176,12 +319,15 @@ namespace NAccLogger
             [CallerFilePath] string callerFilePath = ""
             )
         {
-            return LogImpl.Debug(
-                logCategory,
-                callerMemberName,
-                callerLineNumber,
-                callerFilePath
-                );
+            return
+                GetCallableImpl(
+                    null,
+                    null,
+                    LogType.Debug,
+                    logCategory,
+                    callerMemberName,
+                    callerLineNumber,
+                    callerFilePath);
         }
 
         /// <summary>
@@ -199,12 +345,15 @@ namespace NAccLogger
             [CallerFilePath] string callerFilePath = ""
             )
         {
-            return LogImpl.Warning(
-                logCategory,
-                callerMemberName,
-                callerLineNumber,
-                callerFilePath
-                );
+            return
+                GetCallableImpl(
+                    null,
+                    null,
+                    LogType.Warning,
+                    logCategory,
+                    callerMemberName,
+                    callerLineNumber,
+                    callerFilePath);
         }
 
         /// <summary>
@@ -222,12 +371,15 @@ namespace NAccLogger
             [CallerFilePath] string callerFilePath = ""
             )
         {
-            return LogImpl.Error(
-                logCategory,
-                callerMemberName,
-                callerLineNumber,
-                callerFilePath
-                );
+            return
+                GetCallableImpl(
+                    null,
+                    null,
+                    LogType.Error,
+                    logCategory,
+                    callerMemberName,
+                    callerLineNumber,
+                    callerFilePath);
         }
 
         /// <summary>
@@ -245,12 +397,15 @@ namespace NAccLogger
             [CallerFilePath] string callerFilePath = ""
             )
         {
-            return LogImpl.Fatal(
-                logCategory,
-                callerMemberName,
-                callerLineNumber,
-                callerFilePath
-                );
+            return
+                GetCallableImpl(
+                    null,
+                    null,
+                    LogType.Fatal,
+                    logCategory,
+                    callerMemberName,
+                    callerLineNumber,
+                    callerFilePath);
         }
 
         #endregion
@@ -259,6 +414,7 @@ namespace NAccLogger
 
         /// <summary>
         /// add header entry to the log
+        /// <para>TODO: fix poor desing: is not dispatched ?</para>
         /// </summary>
         public static void Header()
         {
@@ -281,8 +437,11 @@ namespace NAccLogger
             [CallerFilePath] string callerFilePath = ""
             )
         {
-            LogImpl.Info(
+            CallImpl(
+                null,
+                null,
                 text,
+                LogType.Info,
                 logCategory,
                 callerMemberName,
                 callerLineNumber,
@@ -306,8 +465,11 @@ namespace NAccLogger
             [CallerFilePath] string callerFilePath = ""
             )
         {
-            LogImpl.Error(
+            CallImpl(
+                null,
+                null,
                 text,
+                LogType.Error,
                 logCategory,
                 callerMemberName,
                 callerLineNumber,
@@ -331,8 +493,11 @@ namespace NAccLogger
             [CallerFilePath] string callerFilePath = ""
             )
         {
-            LogImpl.Warning(
+            CallImpl(
+                null,
+                null,
                 text,
+                LogType.Warning,
                 logCategory,
                 callerMemberName,
                 callerLineNumber,
@@ -356,8 +521,11 @@ namespace NAccLogger
             [CallerFilePath] string callerFilePath = ""
             )
         {
-            LogImpl.Debug(
+            CallImpl(
+                null,
+                null,
                 text,
+                LogType.Debug,
                 logCategory,
                 callerMemberName,
                 callerLineNumber,
@@ -385,9 +553,10 @@ namespace NAccLogger
             [CallerFilePath] string callerFilePath = ""
             )
         {
-            LogImpl.Add(
+            CallImpl(                
                 text,
                 caller,
+                caller?.GetType().FullName,
                 logType,
                 logCategory,
                 callerMemberName,
@@ -398,6 +567,7 @@ namespace NAccLogger
 
         /// <summary>
         /// add a log item to the log
+        /// <para>usage: transfert a log item from a log to a log, not dispatchable</para>
         /// </summary>
         /// <param name="logItem">log item</param>
         public static void Add(ILogItem logItem)

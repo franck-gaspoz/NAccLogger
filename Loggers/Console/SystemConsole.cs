@@ -17,6 +17,8 @@ namespace NAccLogger.Loggers.Console
         /// build a new system console logger
         /// </summary>
         /// <param name="logParameters">log parameters</param>
+        /// <param name="isColorizationEnabled">true if colorization enabled, false otherwize</param>
+        /// <param name="colorSettings">if provided allows to specifiy colors for log types</param>
         public SystemConsole(
             LogParameters logParameters = null,
             bool isColorizationEnabled = true,
@@ -26,13 +28,12 @@ namespace NAccLogger.Loggers.Console
             ColorSettings = colorSettings ?? new ColorSettings();
         }
 
-        static object _Lock = new object();
+        static readonly object _Lock = new object();
 
         /// <summary>
         /// add a log entry to the system console
-        /// TODO: to be synchronized
         /// </summary>
-        /// <param name="logItem"></param>
+        /// <param name="logItem">log item to be added</param>
         public override void Log(ILogItem logItem)
         {
             lock (_Lock)

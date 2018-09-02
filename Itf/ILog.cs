@@ -9,6 +9,8 @@ namespace NAccLogger.Itf
     /// </summary>
     public interface ILog
     {
+        #region attributes
+
         /// <summary>
         /// enable/disable log items recording in log history (LogItems)
         /// </summary>
@@ -30,12 +32,33 @@ namespace NAccLogger.Itf
         LogParameters LogParameters { get; }
 
         /// <summary>
+        /// if true, any log action is forwarded to nexts loggers in a dispatcher or a pipeline where this log is contained, otherwize this logger is the last to handle the log action
+        /// </summary>
+        bool IsForwardEnabled { get; set; }
+
+        #endregion
+
+        /// <summary>
         /// add header entry to the log
         /// </summary>
         void Header();
+        
+        /// <summary>
+        /// add a log item to the log
+        /// </summary>
+        /// <param name="logItem"></param>
+        void Log(ILogItem logItem);
+
+        #region log add entry operations without filtering
 
         /// <summary>
-        /// default log item add action for recording log items into LogItems
+        /// add a log item to the log
+        /// </summary>
+        /// <param name="logItem">log item</param>
+        void Add(ILogItem logItem);
+
+        /// <summary>
+        /// build a new log item and add it to this logger
         /// </summary>
         /// <param name="text"></param>
         /// <param name="caller">caller object</param>
@@ -55,20 +78,6 @@ namespace NAccLogger.Itf
             );
 
         /// <summary>
-        /// add a log item to the log
-        /// </summary>
-        /// <param name="logItem"></param>
-        void Log(ILogItem logItem);
-
-        #region log add entry operations without filtering
-
-        /// <summary>
-        /// add a log item to the log
-        /// </summary>
-        /// <param name="logItem">log item</param>
-        void Add(ILogItem logItem);
-
-        /// <summary>
         /// add an entry to the log having log level 'Debug' and the specified log category or LogCategory.NotDefined
         /// </summary>
         /// <param name="text">message of the log entry</param>
@@ -76,7 +85,12 @@ namespace NAccLogger.Itf
         /// <param name="callerMemberName">retreive the name of the method or property wich called the log</param>
         /// <param name="callerLineNumber">retreive the name of the line number (if available) where the log call was done</param>
         /// <param name="callerFilePath">retreive the filename (if available) of the source code where the log call was done</param>
-        void Debug(string text, LogCategory logCategory = LogCategory.NotDefined, [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "");
+        void Debug(
+            string text, 
+            LogCategory logCategory = LogCategory.NotDefined, 
+            [CallerMemberName] string callerMemberName = "", 
+            [CallerLineNumber] int callerLineNumber = 0, 
+            [CallerFilePath] string callerFilePath = "");
 
         /// <summary>
         /// add an entry to the log having log level 'Error' and the specified log category or LogCategory.NotDefined
@@ -86,7 +100,12 @@ namespace NAccLogger.Itf
         /// <param name="callerMemberName">retreive the name of the method or property wich called the log</param>
         /// <param name="callerLineNumber">retreive the name of the line number (if available) where the log call was done</param>
         /// <param name="callerFilePath">retreive the filename (if available) of the source code where the log call was done</param>
-        void Error(string text, LogCategory logCategory = LogCategory.NotDefined, [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "");
+        void Error(
+            string text, 
+            LogCategory logCategory = LogCategory.NotDefined, 
+            [CallerMemberName] string callerMemberName = "", 
+            [CallerLineNumber] int callerLineNumber = 0, 
+            [CallerFilePath] string callerFilePath = "");
 
         /// <summary>
         /// add an entry to the log having log level 'Fatal' and the specified log category or LogCategory.NotDefined
@@ -96,7 +115,12 @@ namespace NAccLogger.Itf
         /// <param name="callerMemberName">retreive the name of the method or property wich called the log</param>
         /// <param name="callerLineNumber">retreive the name of the line number (if available) where the log call was done</param>
         /// <param name="callerFilePath">retreive the filename (if available) of the source code where the log call was done</param>
-        void Fatal(string text, LogCategory logCategory = LogCategory.NotDefined, [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "");
+        void Fatal(
+            string text, 
+            LogCategory logCategory = LogCategory.NotDefined, 
+            [CallerMemberName] string callerMemberName = "",
+            [CallerLineNumber] int callerLineNumber = 0, 
+            [CallerFilePath] string callerFilePath = "");
 
         /// <summary>
         /// add an entry to the log having log level 'Info' and the specified log category or LogCategory.NotDefined
@@ -106,7 +130,12 @@ namespace NAccLogger.Itf
         /// <param name="callerMemberName">retreive the name of the method or property wich called the log</param>
         /// <param name="callerLineNumber">retreive the name of the line number (if available) where the log call was done</param>
         /// <param name="callerFilePath">retreive the filename (if available) of the source code where the log call was done</param>
-        void Info(string text, LogCategory logCategory = LogCategory.NotDefined, [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "");
+        void Info(
+            string text, 
+            LogCategory logCategory = LogCategory.NotDefined, 
+            [CallerMemberName] string callerMemberName = "", 
+            [CallerLineNumber] int callerLineNumber = 0, 
+            [CallerFilePath] string callerFilePath = "");
 
         /// <summary>
         /// add an entry to the log having log level 'Warning' and the specified log category or LogCategory.NotDefined
@@ -116,7 +145,12 @@ namespace NAccLogger.Itf
         /// <param name="callerMemberName">retreive the name of the method or property wich called the log</param>
         /// <param name="callerLineNumber">retreive the name of the line number (if available) where the log call was done</param>
         /// <param name="callerFilePath">retreive the filename (if available) of the source code where the log call was done</param>
-        void Warning(string text, LogCategory logCategory = LogCategory.NotDefined, [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "");
+        void Warning(
+            string text, 
+            LogCategory logCategory = LogCategory.NotDefined, 
+            [CallerMemberName] string callerMemberName = "", 
+            [CallerLineNumber] int callerLineNumber = 0, 
+            [CallerFilePath] string callerFilePath = "");
 
         #endregion
 
@@ -132,7 +166,13 @@ namespace NAccLogger.Itf
         /// <param name="callerLineNumber">retreive the name of the line number (if available) where the log call was done</param>
         /// <param name="callerFilePath">retreive the filename (if available) of the source code where the log call was done</param>
         /// <returns>null if log entry doesn't match log filters, else return an invoker to call the T method</returns>
-        ILogInvoker Add(object caller,LogType logType = LogType.NotDefined,LogCategory logCategory = LogCategory.NotDefined, [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "");
+        ILogInvoker Add(
+            object caller,
+            LogType logType = LogType.NotDefined,
+            LogCategory logCategory = LogCategory.NotDefined, 
+            [CallerMemberName] string callerMemberName = "", 
+            [CallerLineNumber] int callerLineNumber = 0, 
+            [CallerFilePath] string callerFilePath = "");
 
         /// <summary>
         /// check for adding an entry to the log having log level 'Debug' and the specified log category or LogCategory.NotDefined
@@ -142,7 +182,11 @@ namespace NAccLogger.Itf
         /// <param name="callerLineNumber">retreive the name of the line number (if available) where the log call was done</param>
         /// <param name="callerFilePath">retreive the filename (if available) of the source code where the log call was done</param>
         /// <returns>null if log entry doesn't match log filters, else return an invoker to call the T method</returns>
-        ILogInvoker Debug(LogCategory logCategory = LogCategory.NotDefined, [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "");
+        ILogInvoker Debug(
+            LogCategory logCategory = LogCategory.NotDefined, 
+            [CallerMemberName] string callerMemberName = "", 
+            [CallerLineNumber] int callerLineNumber = 0, 
+            [CallerFilePath] string callerFilePath = "");
 
         /// <summary>
         /// check for adding an entry to the log having log level 'Error' and the specified log category or LogCategory.NotDefined
@@ -152,7 +196,11 @@ namespace NAccLogger.Itf
         /// <param name="callerLineNumber">retreive the name of the line number (if available) where the log call was done</param>
         /// <param name="callerFilePath">retreive the filename (if available) of the source code where the log call was done</param>
         /// <returns>null if log entry doesn't match log filters, else return an invoker to call the T method</returns>
-        ILogInvoker Error(LogCategory logCategory = LogCategory.NotDefined, [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "");
+        ILogInvoker Error(
+            LogCategory logCategory = LogCategory.NotDefined, 
+            [CallerMemberName] string callerMemberName = "", 
+            [CallerLineNumber] int callerLineNumber = 0, 
+            [CallerFilePath] string callerFilePath = "");
 
         /// <summary>
         /// check for adding an entry to the log having log level 'Fatal' and the specified log category or LogCategory.NotDefined
@@ -162,7 +210,11 @@ namespace NAccLogger.Itf
         /// <param name="callerLineNumber">retreive the name of the line number (if available) where the log call was done</param>
         /// <param name="callerFilePath">retreive the filename (if available) of the source code where the log call was done</param>
         /// <returns>null if log entry doesn't match log filters, else return an invoker to call the T method</returns>
-        ILogInvoker Fatal(LogCategory logCategory = LogCategory.NotDefined, [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "");
+        ILogInvoker Fatal(
+            LogCategory logCategory = LogCategory.NotDefined, 
+            [CallerMemberName] string callerMemberName = "", 
+            [CallerLineNumber] int callerLineNumber = 0, 
+            [CallerFilePath] string callerFilePath = "");
 
         /// <summary>
         /// check for adding an entry to the log having log level 'Info' and the specified log category or LogCategory.NotDefined
@@ -172,7 +224,11 @@ namespace NAccLogger.Itf
         /// <param name="callerLineNumber">retreive the name of the line number (if available) where the log call was done</param>
         /// <param name="callerFilePath">retreive the filename (if available) of the source code where the log call was done</param>
         /// <returns>null if log entry doesn't match log filters, else return an invoker to call the T method</returns>
-        ILogInvoker Info(LogCategory logCategory = LogCategory.NotDefined, [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "");
+        ILogInvoker Info(
+            LogCategory logCategory = LogCategory.NotDefined, 
+            [CallerMemberName] string callerMemberName = "", 
+            [CallerLineNumber] int callerLineNumber = 0, 
+            [CallerFilePath] string callerFilePath = "");
 
         /// <summary>
         /// check for adding an entry to the log having log level 'Warning' and the specified log category or LogCategory.NotDefined
@@ -182,7 +238,11 @@ namespace NAccLogger.Itf
         /// <param name="callerLineNumber">retreive the name of the line number (if available) where the log call was done</param>
         /// <param name="callerFilePath">retreive the filename (if available) of the source code where the log call was done</param>
         /// <returns>null if log entry doesn't match log filters, else return an invoker to call the T method</returns>
-        ILogInvoker Warning(LogCategory logCategory = LogCategory.NotDefined, [CallerMemberName] string callerMemberName = "", [CallerLineNumber] int callerLineNumber = 0, [CallerFilePath] string callerFilePath = "");
+        ILogInvoker Warning(
+            LogCategory logCategory = LogCategory.NotDefined, 
+            [CallerMemberName] string callerMemberName = "", 
+            [CallerLineNumber] int callerLineNumber = 0, 
+            [CallerFilePath] string callerFilePath = "");
 
         #endregion
     }

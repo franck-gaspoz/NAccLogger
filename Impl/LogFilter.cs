@@ -14,21 +14,17 @@ namespace NAccLogger.Impl
     /// shared throught loggers and can be specialized by loggers
     /// test result is cached by thread throught a specialized ILogInvoker
     /// </summary>
-    public class LogFilter : ILogFilter
+    public class LogFilter 
+        : LogFilterBase, 
+        ILogFilter
     {
         #region attributes
 
         /// <summary>
-        /// per thread enabled log invokers
-        /// </summary>
-        protected Dictionary<int, ILogInvoker>
-            LogInvokers =
-            new Dictionary<int, ILogInvoker>();
-
-        /// <summary>
         /// filters values
         /// </summary>
-        protected FilterValues FilterValues = new FilterValues();
+        protected FilterValues<bool> FilterValues 
+            = new FilterValues<bool>();
 
         #endregion
 
@@ -44,10 +40,12 @@ namespace NAccLogger.Impl
         /// clear filter values
         /// <para>all further log items will not be selected (no filters) until new filters are added</para>
         /// </summary>
-        public void Clear()
+        /// <returns>the log filter</returns>
+        public ILogFilter Clear()
         {
             FilterValues.Clear();
             LogInvokers.Clear();
+            return this;
         }
 
         /// <summary>
@@ -103,7 +101,8 @@ namespace NAccLogger.Impl
         /// <param name="callerMemberName">caller member name</param>
         /// <param name="logType">log entry type</param>
         /// <param name="logCategory">log entry category</param>        
-        public void SetIsEnabledFilter(
+        /// <returns>the log filter</returns>
+        public ILogFilter SetIsEnabledFilter(
             bool isEnabled,
             object caller = null,
             string callerTypeName = null,
@@ -119,43 +118,8 @@ namespace NAccLogger.Impl
                 callerMemberName,
                 logType,
                 logCategory);
+            return this;
         }
-
-        /// <summary>
-        /// return a log invoker if any depending on log filters, null otherwise
-        /// </summary>
-        /// <param name="caller">caller object</param>
-        /// <param name="callerMemberName"></param>
-        /// <param name="logType"></param>
-        /// <param name="logCategory"></param>
-        /// <param name="callerLineNumber"></param>
-        /// <param name="callerFilePath"></param>
-        /// <returns>log invoker to logger, else null</returns>
-        protected ILogInvoker GetLogInvoker(
-            ILog logger,
-            object caller,
-            string callerMemberName,
-            LogType logType,
-            LogCategory logCategory,
-            int callerLineNumber,
-            string callerFilePath
-            )
-        {
-            var id = Thread.CurrentThread.ManagedThreadId;
-            if (!LogInvokers.TryGetValue(id, 
-                out ILogInvoker o))
-                LogInvokers
-                    .Add(
-                        id,
-                        o = new LogInvoker());
-            o.Log = logger;
-            o.Caller = caller;
-            o.LogType = logType;
-            o.LogCategory = logCategory;
-            o.CallerFilePath = callerFilePath;
-            o.CallerLineNumber = callerLineNumber;
-            o.CallerMemberName = callerMemberName;
-            return o;
-        }
+        
     }
 }
