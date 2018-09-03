@@ -37,6 +37,17 @@ namespace NAccLogger.Impl
         }
 
         /// <summary>
+        /// get a new log filter by cloning (deep)
+        /// </summary>
+        /// <returns>log filter</returns>
+        public ILogFilter Clone()
+        {
+            var r = new LogFilter()
+                { FilterValues = FilterValues.Clone() };
+            return r;
+        }
+
+        /// <summary>
         /// clear filter values
         /// <para>all further log items will not be selected (no filters) until new filters are added</para>
         /// </summary>

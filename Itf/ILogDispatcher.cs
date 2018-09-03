@@ -11,21 +11,21 @@ namespace NAccLogger.Itf
         /// set a new or change an existing dispatching rule
         /// </summary>
         /// <param name="logger">target logger</param>
-        /// <param name="forwardEnabled">if true, the log action handled by the dispatcher is also forwarded to other dispatchers and to the logs pipeline. If not the dispatcher is the one handling the log action</param>
+        /// <param name="logType">log entry type</param>
+        /// <param name="logCategory">log entry category</param> 
         /// <param name="caller">caller object</param>
         /// <param name="callerTypeName">caller type name</param>
         /// <param name="callerMemberName">caller member name</param>
-        /// <param name="logType">log entry type</param>
-        /// <param name="logCategory">log entry category</param> 
+        /// <param name="forwardEnabled">if true, the log action handled by the dispatcher is also forwarded to other dispatchers and to the logs pipeline. If not the dispatcher is the one handling the log action</param>
         /// <returns>the log dispatcher</returns>
         ILogDispatcher SetDispatchingRule(
             ILog logger,
-            bool forwardEnabled = false,
+            LogType? logType = null,
+            LogCategory? logCategory = null,
             object caller = null,
             string callerTypeName = null,
             string callerMemberName = null,
-            LogType? logType = null,
-            LogCategory? logCategory = null
+            bool forwardEnabled = true
             );
 
         /// <summary>
@@ -50,5 +50,11 @@ namespace NAccLogger.Itf
         /// </summary>
         /// <returns>the log dispatcher</returns>
         ILogDispatcher Clear();
+
+        /// <summary>
+        /// get a new log dispatcher by cloning (deep)
+        /// </summary>
+        /// <returns>log dispatcher</returns>
+        ILogDispatcher Clone();
     }
 }

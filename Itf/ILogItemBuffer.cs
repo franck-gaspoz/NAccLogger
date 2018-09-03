@@ -38,5 +38,12 @@ namespace NAccLogger.Itf
         /// event item range added
         /// </summary>
         event EventHandler<IEnumerable<ILogItem>> ItemRangeAdded;
+
+        /// <summary>
+        /// get a new log item buffer by cloning this
+        /// <para>event handlers and buffer state is not cloned</para>
+        /// </summary>
+        /// <returns>cloned log item buffer</returns>
+        ILogItemBuffer Clone();
     }
 }

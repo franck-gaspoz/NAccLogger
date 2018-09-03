@@ -42,11 +42,68 @@ namespace NAccLogger
                                     Dictionary<string, T>>>>>();
 
         /// <summary>
+        /// get new filter values by cloning this
+        /// </summary>
+        /// <returns>filter values</returns>
+        public FilterValues<T> Clone()
+        {
+            var r = new FilterValues<T>();
+            var lst = GetFilters();
+            foreach ( 
+                var o
+                in lst )
+                r.AddOrSetValue(o);
+            return r;
+        }
+
+        /// <summary>
+        /// get filter values
+        /// </summary>
+        /// <returns>enumerable of filter values</returns>
+        public IEnumerable<(object caller,string logType,string logCategory,string callerTypeName,string callerMemberName,T value)> GetFilters()
+        {
+            List<(object caller, string logType, string logCategory, string callerTypeName, string callerMemberName, T value)> lst
+                = new List<(object caller, string logType, string logCategory, string callerTypeName, string callerMemberName, T value)>();
+            foreach (var kvcaller in Filters)
+                foreach (var kvlogtype in kvcaller.Value)
+                    foreach (var kvlogcat in kvlogtype.Value)
+                        foreach (var kvctypename in kvlogcat.Value)
+                            foreach (var kvcmembername in kvctypename.Value)
+                                lst.Add(
+                                    (kvcaller.Key, kvlogtype.Key, kvlogcat.Key, kvctypename.Key, kvcmembername.Key, kvcmembername.Value)
+                                    );
+            return lst;
+        }
+
+        /// <summary>
         /// clear filter values
         /// </summary>
         public void Clear()
         {
             Filters.Clear();
+        }
+
+        /// <summary>
+        /// set values of a filter : (caller,callerTypeName,callerMemberName,logType,logCategroy) -+ isEnabled
+        /// </summary>
+        /// <param name="filter">filter value</param>
+        public void AddOrSetValue(
+            (object caller, string logType, string logCategory, string callerTypeName, string callerMemberName, T value) filter
+            )
+        {
+            var (caller, logType, logCategory, callerTypeName, callerMemberName, value) = filter;
+            if (!Filters.TryGetValue(caller, out var d1))
+                Filters.Add(caller, d1 = new Dictionary<string, Dictionary<string, Dictionary<string, Dictionary<string, T>>>>());
+            if (!d1.TryGetValue(logType, out var d2))
+                d1.Add(logType, d2 = new Dictionary<string, Dictionary<string, Dictionary<string, T>>>());
+            if (!d2.TryGetValue(logCategory, out var d3))
+                d2.Add(logCategory, d3 = new Dictionary<string, Dictionary<string, T>>());
+            if (!d3.TryGetValue(callerTypeName, out var d4))
+                d3.Add(callerTypeName, d4 = new Dictionary<string, T>());
+            if (!d4.ContainsKey(callerMemberName))
+                d4.Add(callerMemberName, value);
+            else
+                d4[callerMemberName] = value;
         }
 
         /// <summary>

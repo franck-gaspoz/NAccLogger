@@ -1,6 +1,5 @@
 ﻿using NAccLogger.Itf;
 using NAccLogger.Loggers.Pipe;
-using System.Collections.Generic;
 
 namespace NAccLogger.Impl
 {
@@ -28,6 +27,19 @@ namespace NAccLogger.Impl
         public LogDispatcher()
         {
             
+        }
+
+        /// <summary>
+        /// get a new log dispatcher by cloning (deep)
+        /// </summary>
+        /// <returns>log dispatcher</returns>
+        public ILogDispatcher Clone()
+        {
+            var r = new LogDispatcher()
+            {
+                FilterValues = FilterValues.Clone()
+            };
+            return r;
         }
 
         /// <summary>
@@ -71,21 +83,21 @@ namespace NAccLogger.Impl
         /// set a new or change an existing dispatching rule
         /// </summary>
         /// <param name="logger">target logger</param>
-        /// <param name="forwardEnabled">if true, the log action handled by the dispatcher is also forwarded to other dispatchers and to the logs pipeline. If not the dispatcher is the one handling the log action</param>
+        /// <param name="logType">log entry type</param>
+        /// <param name="logCategory">log entry category</param> 
         /// <param name="caller">caller object</param>
         /// <param name="callerTypeName">caller type name</param>
         /// <param name="callerMemberName">caller member name</param>
-        /// <param name="logType">log entry type</param>
-        /// <param name="logCategory">log entry category</param>
+        /// <param name="forwardEnabled">if true, the log action handled by the dispatcher is also forwarded to other dispatchers and to the logs pipeline. If not the dispatcher is the one handling the log action</param>
         /// <returns>the log dispatcher</returns>
         public ILogDispatcher SetDispatchingRule(
             ILog logger,
-            bool forwardEnabled = false,
+            LogType? logType = null,
+            LogCategory? logCategory = null,
             object caller = null,
             string callerTypeName = null,
             string callerMemberName = null,
-            LogType? logType = null,
-            LogCategory? logCategory = null
+            bool forwardEnabled = true
             )
         {
             var dispatcher = FilterValues

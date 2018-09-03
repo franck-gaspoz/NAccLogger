@@ -46,5 +46,11 @@ namespace NAccLogger.Itf
         /// restore default columns size
         /// </summary>
         void ResetColumnsSize();
+
+        /// <summary>
+        /// get a new log item text formatter by cloning this
+        /// </summary>
+        /// <returns></returns>
+        ILogItemTextFormatter Clone();
     }
 }

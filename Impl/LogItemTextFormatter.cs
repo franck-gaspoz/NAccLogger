@@ -1,4 +1,5 @@
 ﻿using NAccLogger.Ext;
+using NAccLogger.Ext.Collection;
 using NAccLogger.Itf;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,8 @@ namespace NAccLogger.Impl
     /// </summary>
     public class LogItemTextFormatter : ILogItemTextFormatter
     {
+        #region attributes
+
         /// <summary>
         /// columns seperator
         /// </summary>
@@ -35,6 +38,8 @@ namespace NAccLogger.Impl
         /// </summary>
         public LinkedList<string> Columns
             = new LinkedList<string>();
+
+        #endregion
 
         /// <summary>
         /// build a new formatter
@@ -185,6 +190,20 @@ namespace NAccLogger.Impl
             var r = new List<string>();
             r.AddRange(Columns);
             return r;
+        }
+
+        /// <summary>
+        /// get a new log item text formatter by cloning this
+        /// </summary>
+        /// <returns></returns>
+        public ILogItemTextFormatter Clone()
+        {
+            return new LogItemTextFormatter()
+            {
+                LogItemToStringColumnsSeparator = LogItemToStringColumnsSeparator,
+                AvailableColumns = AvailableColumns.Clone(),
+                MinColumnSize = MinColumnSize.Clone()
+            };
         }
     }
 }

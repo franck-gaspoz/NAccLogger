@@ -14,6 +14,15 @@ namespace NAccLogger.Impl
         public LogFactory() { }
 
         /// <summary>
+        /// get a new log factory by cloning this
+        /// </summary>
+        /// <returns>cloned log factory</returns>
+        public virtual ILogFactory Clone()
+        {
+            return new LogFactory();
+        }
+
+        /// <summary>
         /// create a log filter
         /// </summary>
         /// <returns>log filter impl.</returns>

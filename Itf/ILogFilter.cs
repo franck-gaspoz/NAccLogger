@@ -58,5 +58,11 @@
             string callerMemberName = null, 
             LogType? logType = null, 
             LogCategory? logCategory = null);
+
+        /// <summary>
+        /// get a new log filter by cloning (deep)
+        /// </summary>
+        /// <returns>log filter</returns>
+        ILogFilter Clone();
     }
 }

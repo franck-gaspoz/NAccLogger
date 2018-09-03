@@ -48,5 +48,11 @@
         /// </summary>
         /// <returns>log item buffer</returns>
         ILogItemBuffer CreateLogItemBuffer();
+
+        /// <summary>
+        /// get a new log factory by cloning this
+        /// </summary>
+        /// <returns>cloned log factory</returns>
+        ILogFactory Clone();
     }
 }

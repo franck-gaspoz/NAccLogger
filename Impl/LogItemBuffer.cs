@@ -10,6 +10,8 @@ namespace NAccLogger.Impl
     public class LogItemBuffer
         : ILogItemBuffer
     {
+        #region attributes
+
         /// <summary>
         /// log items buffer
         /// </summary>
@@ -43,6 +45,26 @@ namespace NAccLogger.Impl
         public event EventHandler<IEnumerable<ILogItem>> ItemRangeAdded;
 
         /// <summary>
+        /// synchro lock
+        /// </summary>
+        protected readonly object Lock = new object();
+
+        #endregion
+
+        /// <summary>
+        /// get a new log item buffer by cloning this
+        /// </summary>
+        /// <returns>cloned log item buffer</returns>
+        public ILogItemBuffer Clone()
+        {
+            return new LogItemBuffer()
+            {
+                IsDeferedAddEnabled = IsDeferedAddEnabled,
+                DeferedAddRangeSize = DeferedAddRangeSize
+            };
+        }
+
+        /// <summary>
         /// add a log item to the buffer
         /// </summary>
         /// <param name="logItem">log item</param>
@@ -70,15 +92,18 @@ namespace NAccLogger.Impl
         /// </summary>
         public void Flush()
         {
-            var lst = new List<ILogItem>();
-            lst.AddRange(DeferedItems);
-            DeferedItems.Clear();
-            foreach (var o in lst)
-                if (!LogItems.ContainsKey(o.Index))
-                    LogItems.Add(
-                        o.Index,
-                        o);
-            ItemRangeAdded?.Invoke(this, lst);
+            lock (Lock)
+            {
+                var lst = new List<ILogItem>();
+                lst.AddRange(DeferedItems);
+                DeferedItems.Clear();
+                foreach (var o in lst)
+                    if (!LogItems.ContainsKey(o.Index))
+                        LogItems.Add(
+                            o.Index,
+                            o);
+                ItemRangeAdded?.Invoke(this, lst);
+            }
         }
 
     }

@@ -42,5 +42,22 @@ namespace NAccLogger
             LogItemTextFormatter = LogFactory.CreateLogItemTextFormatter();
             LogItemBuffer = LogFactory.CreateLogItemBuffer();
         }
+
+        /// <summary>
+        /// get new log parameters by cloning this
+        /// </summary>
+        /// <returns>log parameters</returns>
+        public LogParameters Clone()
+        {
+            var r = new LogParameters()
+            {
+                LogFactory = LogFactory,
+                LogFilter = LogFilter.Clone(),
+                LogItemTextFormatter = LogItemTextFormatter.Clone(),
+                LogItemBuffer = LogItemBuffer.Clone(),
+                IsRecordingEnabled = IsRecordingEnabled
+            };
+            return r;
+        }
     }
 }

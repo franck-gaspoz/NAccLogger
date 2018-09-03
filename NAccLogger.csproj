@@ -65,8 +65,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ext\Collection\CollectionExt.cs" />
     <Compile Include="Ext\IgnoreColumnAttribute.cs" />
     <Compile Include="Ext\ObjectExt.cs" />
+    <Compile Include="Files.cs" />
     <Compile Include="FilterValues.cs" />
     <Compile Include="Impl\LogDispatcher.cs" />
     <Compile Include="Impl\LogFactory.cs" />
@@ -85,6 +87,9 @@
     <Compile Include="Impl\LogBase.cs" />
     <Compile Include="LogCategory.cs" />
     <Compile Include="Loggers\Console\ColorSettings.cs" />
+    <Compile Include="Loggers\File\FileLog.cs" />
+    <Compile Include="Loggers\File\FileLogParameters.cs" />
+    <Compile Include="Loggers\File\FileLogArchiveEvent.cs" />
     <Compile Include="Loggers\Pipe\Dispatcher.cs" />
     <Compile Include="Loggers\Pipe\Winsock\ClientHandler.cs" />
     <Compile Include="Loggers\Pipe\Winsock\Com\Command.cs" />
