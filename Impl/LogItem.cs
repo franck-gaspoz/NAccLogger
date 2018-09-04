@@ -4,9 +4,6 @@ using System;
 using System.Diagnostics;
 using System.Net;
 using System.Threading;
-using System.Linq;
-using System.Net.Sockets;
-using System.Net.NetworkInformation;
 
 namespace NAccLogger.Impl
 {

@@ -43,9 +43,9 @@
         public long FileMaxSize { get; set; } = 1024 * 1024 * 1024;
 
         /// <summary>
-        /// if true, logs are added to file by ranges, else individually
+        /// if true, logs are added to file by ranges, else individually (default false)
         /// </summary>
-        public bool IsDefered { get; set; } = true;
+        public bool IsDefered { get; set; } = false;
 
         /// <summary>
         /// size of defered range of log items

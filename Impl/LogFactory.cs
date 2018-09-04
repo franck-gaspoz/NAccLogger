@@ -68,7 +68,7 @@ namespace NAccLogger.Impl
         /// <returns>log item text formatter impl.</returns>
         public virtual ILogItemTextFormatter CreateLogItemTextFormatter()
         {
-            return new LogItemTextFormatter();
+            return new LogItemTextFormatter<LogItem>();
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace NAccLogger.Impl
         /// create a log item buffer
         /// </summary>
         /// <returns>log item buffer</returns>
-        public ILogItemBuffer CreateLogItemBuffer()
+        public virtual ILogItemBuffer CreateLogItemBuffer()
         {
             return new LogItemBuffer();
         }

@@ -1,5 +1,6 @@
 ﻿using NAccLogger.Itf;
 using NAccLogger.Loggers.Pipe;
+using System.Collections.Generic;
 
 namespace NAccLogger.Impl
 {
@@ -50,6 +51,21 @@ namespace NAccLogger.Impl
         {
             FilterValues.Clear();
             return this;
+        }
+
+        /// <summary>
+        /// returns all loggers from dispatching rules
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<ILog> GetLoggers()
+        {
+            var r = new List<ILog>();
+            var lst = FilterValues.GetFilters();
+            foreach (var (caller, logType, logCategory, callerTypeName, callerMemberName, value) in lst)
+                foreach (var o in value.Loggers)
+                    if (!r.Contains(o))
+                        r.Add(o);
+            return r;
         }
 
         /// <summary>

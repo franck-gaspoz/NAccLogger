@@ -1,4 +1,5 @@
 ﻿using NAccLogger.Loggers.Pipe;
+using System.Collections.Generic;
 
 namespace NAccLogger.Itf
 {
@@ -27,6 +28,12 @@ namespace NAccLogger.Itf
             string callerMemberName = null,
             bool forwardEnabled = true
             );
+
+        /// <summary>
+        /// returns all loggers from dispatching rules
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<ILog> GetLoggers();
 
         /// <summary>
         /// get a dispatcher according to dispatching properties and rules. return a dispatcher pipe if founded, null else

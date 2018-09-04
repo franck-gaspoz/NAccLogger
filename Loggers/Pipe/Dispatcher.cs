@@ -14,6 +14,8 @@ namespace NAccLogger.Loggers.Pipe
     public class Dispatcher
         : LogBase
     {
+        #region attributes
+
         /// <summary>
         /// ordered list of loggers
         /// </summary>
@@ -38,6 +40,8 @@ namespace NAccLogger.Loggers.Pipe
         /// <param name="logParameters"></param>
         public Dispatcher(LogParameters logParameters = null)
             : base(logParameters) { }
+
+        #endregion
 
         /// <summary>
         /// build a new repeater logger initialized with logger list
@@ -151,6 +155,19 @@ namespace NAccLogger.Loggers.Pipe
 
             return minvoker;
         }
+
+        #region non filtered log actions
+
+        /// <summary>
+        /// add header entry to the log
+        /// </summary>
+        public override void Header()
+        {
+            foreach (var o in Loggers)
+                o.Header();
+        }
+
+        #endregion
 
         #region filtered log actions
 

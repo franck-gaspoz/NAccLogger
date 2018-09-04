@@ -11,7 +11,9 @@ namespace NAccLogger.Impl
     /// <summary>
     /// format a log item into a string
     /// </summary>
-    public class LogItemTextFormatter : ILogItemTextFormatter
+    public class LogItemTextFormatter<T> 
+        : ILogItemTextFormatter
+        where T : ILogItem
     {
         #region attributes
 
@@ -69,7 +71,7 @@ namespace NAccLogger.Impl
             Columns.Clear();
             MinColumnSize.Clear();
 
-            foreach (var p in typeof(LogItem).GetProperties())
+            foreach (var p in typeof(T).GetProperties())
             {
                 var at = p.GetCustomAttribute<IgnoreColumnAttribute>(true);
                 if (at == null)
@@ -198,7 +200,7 @@ namespace NAccLogger.Impl
         /// <returns></returns>
         public ILogItemTextFormatter Clone()
         {
-            return new LogItemTextFormatter()
+            return new LogItemTextFormatter<T>()
             {
                 LogItemToStringColumnsSeparator = LogItemToStringColumnsSeparator,
                 AvailableColumns = AvailableColumns.Clone(),

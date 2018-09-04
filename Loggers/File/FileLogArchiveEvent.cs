@@ -14,5 +14,10 @@
         /// day has changed since last log item added to the file
         /// </summary>
         DayChanged,
+
+        /// <summary>
+        /// no archive
+        /// </summary>
+        None
     }
 }

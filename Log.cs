@@ -151,8 +151,8 @@ namespace NAccLogger
                     callerLineNumber,
                     callerFilePath
                     );
-        }
-        
+        }       
+
         /// <summary>
         /// non filtered log action call to impl.
         /// </summary>
@@ -373,10 +373,13 @@ namespace NAccLogger
 
         /// <summary>
         /// add header entry to the log
-        /// <para>TODO: fix poor desing: is not dispatched ?</para>
         /// </summary>
         public static void Header()
         {
+            if (LogDispatcher != null)
+                foreach (var o in LogDispatcher.GetLoggers())
+                    o.Header();
+
             LogImpl.Header();
         }
 

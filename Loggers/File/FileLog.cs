@@ -132,6 +132,10 @@ namespace NAccLogger.Loggers.File
                         && beforeWriteItemFileInfo.Length >= FileLogParameters.FileMaxSize)
                         ArchiveFileLog(beforeWriteItemFileInfo);
                     break;
+
+                case FileLogArchiveEvent.None:
+                    // does nothing
+                    break;
             }
         }
 
